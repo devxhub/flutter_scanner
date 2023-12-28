@@ -25,6 +25,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
+import android.graphics.drawable.Drawable;
 import android.hardware.Camera;
 import android.os.Build;
 import android.os.Bundle;
@@ -56,6 +57,7 @@ import com.google.android.gms.vision.barcode.Barcode;
 import com.google.android.gms.vision.barcode.BarcodeDetector;
 
 import java.io.IOException;
+import java.io.InputStream;
 
 /**
  * Activity for the multi-tracker app. This app detects barcodes and displays
@@ -64,8 +66,7 @@ import java.io.IOException;
  * the position,
  * size, and ID of each barcode.
  */
-public final class BarcodeCaptureActivity extends AppCompatActivity
-        implements BarcodeGraphicTracker.BarcodeUpdateListener, View.OnClickListener {
+public final class BarcodeCaptureActivity extends AppCompatActivity implements BarcodeGraphicTracker.BarcodeUpdateListener, View.OnClickListener {
 
     // intent request code to handle updating play services if needed.
     private static final int RC_HANDLE_GMS = 9001;
@@ -86,18 +87,17 @@ public final class BarcodeCaptureActivity extends AppCompatActivity
 
     private ImageView imgViewBarcodeCaptureUseFlash;
     private ImageView imgViewSwitchCamera;
+    String flashIconPath = "";
+    String flashOffIconPath = "";
 
     public static int SCAN_MODE = SCAN_MODE_ENUM.QR.ordinal();
 
     public enum SCAN_MODE_ENUM {
-        QR,
-        BARCODE,
-        DEFAULT
+        QR, BARCODE, DEFAULT
     }
 
     enum USE_FLASH {
-        ON,
-        OFF
+        ON, OFF
     }
 
     private int flashStatus = USE_FLASH.OFF.ordinal();
@@ -113,34 +113,68 @@ public final class BarcodeCaptureActivity extends AppCompatActivity
 
             String buttonText = "";
             String iconSize = "";
+            String fontSize = "";
+            String changeCameraIconPath = "";
+            flashIconPath = "";
             try {
                 buttonText = (String) getIntent().getStringExtra("cancelButtonText");
                 iconSize = (String) getIntent().getStringExtra("iconSize");
+                fontSize = (String) getIntent().getStringExtra("fontSize");
+                flashIconPath = (String) getIntent().getStringExtra("flashIconPath");
+                flashOffIconPath = (String) getIntent().getStringExtra("flashOffIconPath");
+                changeCameraIconPath = (String) getIntent().getStringExtra("changeCameraIconPath");
             } catch (Exception e) {
                 buttonText = "Cancel";
                 iconSize = "50";
+                changeCameraIconPath = "";
+                changeCameraIconPath = "";
                 Log.e("BCActivity:onCreate()", "onCreate: " + e.getLocalizedMessage());
             }
 
             Button btnBarcodeCaptureCancel = findViewById(R.id.btnBarcodeCaptureCancel);
             btnBarcodeCaptureCancel.setText(buttonText);
+            if(fontSize != "0"){
+            btnBarcodeCaptureCancel.setTextSize(Float.valueOf(fontSize));
+            }
+            
             btnBarcodeCaptureCancel.setOnClickListener(this);
 
             imgViewBarcodeCaptureUseFlash = findViewById(R.id.imgViewBarcodeCaptureUseFlash);
             imgViewBarcodeCaptureUseFlash.setOnClickListener(this);
-            imgViewBarcodeCaptureUseFlash
-                    .setVisibility(FlutterBarcodeScannerPlugin.isShowFlashIcon ? View.VISIBLE : View.GONE);
-                    imgViewBarcodeCaptureUseFlash.getLayoutParams().width = Integer.valueOf(iconSize);
-                    imgViewBarcodeCaptureUseFlash.getLayoutParams().height = Integer.valueOf(iconSize);
+            imgViewBarcodeCaptureUseFlash.setVisibility(FlutterBarcodeScannerPlugin.isShowFlashIcon ? View.VISIBLE : View.GONE);
+             if(iconSize != "0"){
+            imgViewBarcodeCaptureUseFlash.getLayoutParams().width = Integer.valueOf(iconSize);
+            imgViewBarcodeCaptureUseFlash.getLayoutParams().height = Integer.valueOf(iconSize);
+             }
+            if (!flashIconPath.equals("")) {
+                try {
+                    InputStream is = getAssets().open("flutter_assets/" + flashOffIconPath);
+                    Drawable d = Drawable.createFromStream(is, null);
+                    imgViewBarcodeCaptureUseFlash.setImageDrawable(d);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+
 
             imgViewSwitchCamera = findViewById(R.id.imgViewSwitchCamera);
             imgViewSwitchCamera.setOnClickListener(this);
-
+ if(iconSize != "0"){
             imgViewSwitchCamera.getLayoutParams().width = Integer.valueOf(iconSize);
-                    imgViewSwitchCamera.getLayoutParams().height = Integer.valueOf(iconSize);
+            imgViewSwitchCamera.getLayoutParams().height = Integer.valueOf(iconSize);
+ }
 
             mPreview = findViewById(R.id.preview);
             mGraphicOverlay = findViewById(R.id.graphicOverlay);
+            if (!changeCameraIconPath.equals("")) {
+                try {
+                    InputStream is = getAssets().open("flutter_assets/" + changeCameraIconPath);
+                    Drawable d = Drawable.createFromStream(is, null);
+                    imgViewSwitchCamera.setImageDrawable(d);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
 
             // read parameters from the intent used to launch the activity.
             boolean autoFocus = true;
@@ -168,10 +202,9 @@ public final class BarcodeCaptureActivity extends AppCompatActivity
      * sending the request.
      */
     private void requestCameraPermission() {
-        final String[] permissions = new String[] { Manifest.permission.CAMERA };
+        final String[] permissions = new String[]{Manifest.permission.CAMERA};
 
-        if (!ActivityCompat.shouldShowRequestPermissionRationale(this,
-                Manifest.permission.CAMERA)) {
+        if (!ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.CAMERA)) {
             ActivityCompat.requestPermissions(this, permissions, RC_HANDLE_CAMERA_PERM);
             return;
         }
@@ -181,16 +214,12 @@ public final class BarcodeCaptureActivity extends AppCompatActivity
         View.OnClickListener listener = new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                ActivityCompat.requestPermissions(thisActivity, permissions,
-                        RC_HANDLE_CAMERA_PERM);
+                ActivityCompat.requestPermissions(thisActivity, permissions, RC_HANDLE_CAMERA_PERM);
             }
         };
 
         findViewById(R.id.topLayout).setOnClickListener(listener);
-        Snackbar.make(mGraphicOverlay, R.string.permission_camera_rationale,
-                Snackbar.LENGTH_INDEFINITE)
-                .setAction(R.string.ok, listener)
-                .show();
+        Snackbar.make(mGraphicOverlay, R.string.permission_camera_rationale, Snackbar.LENGTH_INDEFINITE).setAction(R.string.ok, listener).show();
     }
 
     @Override
@@ -226,8 +255,7 @@ public final class BarcodeCaptureActivity extends AppCompatActivity
         // create a separate tracker instance for each barcode.
         BarcodeDetector barcodeDetector = new BarcodeDetector.Builder(context).build();
         BarcodeTrackerFactory barcodeFactory = new BarcodeTrackerFactory(mGraphicOverlay, this);
-        barcodeDetector.setProcessor(
-                new MultiProcessor.Builder<>(barcodeFactory).build());
+        barcodeDetector.setProcessor(new MultiProcessor.Builder<>(barcodeFactory).build());
 
         if (!barcodeDetector.isOperational()) {
             // Check for low storage. If there is low storage, the native library will not
@@ -246,16 +274,11 @@ public final class BarcodeCaptureActivity extends AppCompatActivity
         // to other detection examples to enable the barcode detector to detect small
         // barcodes
         // at long distances.
-        CameraSource.Builder builder = new CameraSource.Builder(getApplicationContext(), barcodeDetector)
-                .setFacing(cameraFacing)
-                .setRequestedPreviewSize(1600, 1024)
-                .setRequestedFps(30.0f)
-                .setFlashMode(useFlash ? Camera.Parameters.FLASH_MODE_TORCH : null);
+        CameraSource.Builder builder = new CameraSource.Builder(getApplicationContext(), barcodeDetector).setFacing(cameraFacing).setRequestedPreviewSize(1600, 1024).setRequestedFps(30.0f).setFlashMode(useFlash ? Camera.Parameters.FLASH_MODE_TORCH : null);
 
         // make sure that auto focus is an available option
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
-            builder = builder.setFocusMode(
-                    autoFocus ? Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE : null);
+            builder = builder.setFocusMode(autoFocus ? Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE : null);
         }
 
         // Stop & release current camera source before creating a new one.
@@ -318,9 +341,7 @@ public final class BarcodeCaptureActivity extends AppCompatActivity
      * @see #requestPermissions(String[], int)
      */
     @Override
-    public void onRequestPermissionsResult(int requestCode,
-            @NonNull String[] permissions,
-            @NonNull int[] grantResults) {
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         if (requestCode != RC_HANDLE_CAMERA_PERM) {
             super.onRequestPermissionsResult(requestCode, permissions, grantResults);
             return;
@@ -341,10 +362,7 @@ public final class BarcodeCaptureActivity extends AppCompatActivity
         };
 
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Allow permissions")
-                .setMessage(R.string.no_camera_permission)
-                .setPositiveButton(R.string.ok, listener)
-                .show();
+        builder.setTitle("Allow permissions").setMessage(R.string.no_camera_permission).setPositiveButton(R.string.ok, listener).show();
     }
 
     /**
@@ -356,8 +374,7 @@ public final class BarcodeCaptureActivity extends AppCompatActivity
      */
     private void startCameraSource() throws SecurityException {
         // check that the device has play services available.
-        int code = GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(
-                getApplicationContext());
+        int code = GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(getApplicationContext());
         if (code != ConnectionResult.SUCCESS) {
             Dialog dlg = GoogleApiAvailability.getInstance().getErrorDialog(this, code, RC_HANDLE_GMS);
             dlg.show();
@@ -420,16 +437,33 @@ public final class BarcodeCaptureActivity extends AppCompatActivity
     @Override
     public void onClick(View v) {
         int i = v.getId();
-        if (i == R.id.imgViewBarcodeCaptureUseFlash &&
-                getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA_FLASH)) {
+        if (i == R.id.imgViewBarcodeCaptureUseFlash && getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA_FLASH)) {
             try {
                 if (flashStatus == USE_FLASH.OFF.ordinal()) {
                     flashStatus = USE_FLASH.ON.ordinal();
                     imgViewBarcodeCaptureUseFlash.setImageResource(R.drawable.ic_barcode_flash_on);
+                    if (!flashIconPath.equals("")) {
+                        try {
+                            InputStream is = getAssets().open("flutter_assets/" + flashIconPath);
+                            Drawable d = Drawable.createFromStream(is, null);
+                            imgViewBarcodeCaptureUseFlash.setImageDrawable(d);
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
                     turnOnOffFlashLight(true);
                 } else {
                     flashStatus = USE_FLASH.OFF.ordinal();
                     imgViewBarcodeCaptureUseFlash.setImageResource(R.drawable.ic_barcode_flash_off);
+                    if (!flashIconPath.equals("")) {
+                        try {
+                            InputStream is = getAssets().open("flutter_assets/" + flashOffIconPath);
+                            Drawable d = Drawable.createFromStream(is, null);
+                            imgViewBarcodeCaptureUseFlash.setImageDrawable(d);
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
                     turnOnOffFlashLight(false);
                 }
             } catch (Exception e) {
@@ -477,8 +511,7 @@ public final class BarcodeCaptureActivity extends AppCompatActivity
 
                 mCameraSource.setFlashMode(flashMode);
             } else {
-                Toast.makeText(getBaseContext(), "Unable to access flashlight as flashlight not available",
-                        Toast.LENGTH_SHORT).show();
+                Toast.makeText(getBaseContext(), "Unable to access flashlight as flashlight not available", Toast.LENGTH_SHORT).show();
             }
         } catch (Exception e) {
             Toast.makeText(getBaseContext(), "Unable to access flashlight.", Toast.LENGTH_SHORT).show();
@@ -501,11 +534,11 @@ public final class BarcodeCaptureActivity extends AppCompatActivity
          * @param detector The detector reporting the event - use this to
          *                 retrieve extended info about event state.
          * @return Whether or not the detector should consider this event
-         *         as handled. If an event was not handled, the detector
-         *         will continue to accumulate movement until an event is
-         *         handled. This can be useful if an application, for example,
-         *         only wants to update scaling factors if the change is
-         *         greater than 0.01.
+         * as handled. If an event was not handled, the detector
+         * will continue to accumulate movement until an event is
+         * handled. This can be useful if an application, for example,
+         * only wants to update scaling factors if the change is
+         * greater than 0.01.
          */
         @Override
         public boolean onScale(ScaleGestureDetector detector) {
@@ -519,10 +552,10 @@ public final class BarcodeCaptureActivity extends AppCompatActivity
          * @param detector The detector reporting the event - use this to
          *                 retrieve extended info about event state.
          * @return Whether or not the detector should continue recognizing
-         *         this gesture. For example, if a gesture is beginning
-         *         with a focal point outside of a region where it makes
-         *         sense, onScaleBegin() may return false to ignore the
-         *         rest of the gesture.
+         * this gesture. For example, if a gesture is beginning
+         * with a focal point outside of a region where it makes
+         * sense, onScaleBegin() may return false to ignore the
+         * rest of the gesture.
          */
         @Override
         public boolean onScaleBegin(ScaleGestureDetector detector) {

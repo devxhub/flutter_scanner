@@ -30,7 +30,15 @@ class _MyAppState extends State<MyApp> {
     // Platform messages may fail, so we use a try/catch PlatformException.
     try {
       barcodeScanRes = await FlutterBarcodeScanner.scanBarcode(
-          '#ff6666', 'Cancel', true, ScanMode.QR, 100);
+          '#ff6666',
+          'Cancel',
+          true,
+          ScanMode.QR,
+          100,
+          20,
+          "assets/flash.png",
+          "assets/flashoff.png",
+          "assets/camera.png");
       print(barcodeScanRes);
     } on PlatformException {
       barcodeScanRes = 'Failed to get platform version.';
@@ -52,7 +60,15 @@ class _MyAppState extends State<MyApp> {
     // Platform messages may fail, so we use a try/catch PlatformException.
     try {
       barcodeScanRes = await FlutterBarcodeScanner.scanBarcode(
-          '#ff6666', 'Cancel', true, ScanMode.BARCODE, 50);
+          '#ff6666',
+          'Cancel',
+          true,
+          ScanMode.BARCODE,
+          50,
+          20,
+          "assets/flash.png",
+          "assets/flashoff.png",
+          "assets/camera.png");
       print(barcodeScanRes);
     } on PlatformException {
       barcodeScanRes = 'Failed to get platform version.';
@@ -90,7 +106,12 @@ class _MyAppState extends State<MyApp> {
                             onPressed: () => startBarcodeScanStream(),
                             child: Text('Start barcode scan stream')),
                         Text('Scan result : $_scanBarcode\n',
-                            style: TextStyle(fontSize: 20))
+                            style: TextStyle(fontSize: 20)),
+                        Image.asset(
+                          "assets/flash.png",
+                          width: 20,
+                          height: 20,
+                        )
                       ]));
             })));
   }
