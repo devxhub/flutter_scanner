@@ -89,21 +89,30 @@ public class SwiftFlutterBarcodeScannerPlugin: NSObject, FlutterPlugin, ScanBarc
         }
         if let flashIconPath = args["flashIconPath"] as? String{
             SwiftFlutterBarcodeScannerPlugin.flashIconPath = flashIconPath
-            let key = registrar?.lookupKey(forAsset: flashIconPath)
-            let imagePath = Bundle.main.path(forResource: key, ofType: nil)!
-            SwiftFlutterBarcodeScannerPlugin.flashIconImage = UIImage(contentsOfFile: imagePath)!
+            if flashIconPath != ""{
+                let key = registrar?.lookupKey(forAsset: flashIconPath)
+                let imagePath = Bundle.main.path(forResource: key, ofType: nil)!
+                SwiftFlutterBarcodeScannerPlugin.flashIconImage = UIImage(contentsOfFile: imagePath)!
+            }
+            
         }
         if let flashOffIconPath = args["flashOffIconPath"] as? String{
             SwiftFlutterBarcodeScannerPlugin.flashOffIconPath = flashOffIconPath
-            let key = registrar?.lookupKey(forAsset: flashOffIconPath)
-            let imagePath = Bundle.main.path(forResource: key, ofType: nil)!
-            SwiftFlutterBarcodeScannerPlugin.flashOffIconImage = UIImage(contentsOfFile: imagePath)!
+            if flashOffIconPath != "" {
+                let key = registrar?.lookupKey(forAsset: flashOffIconPath)
+                let imagePath = Bundle.main.path(forResource: key, ofType: nil)!
+                SwiftFlutterBarcodeScannerPlugin.flashOffIconImage = UIImage(contentsOfFile: imagePath)!
+            }
+            
         }
         if let changeCameraIconPath = args["changeCameraIconPath"] as? String{
             SwiftFlutterBarcodeScannerPlugin.changeCameraIconPath = changeCameraIconPath
-            let key = registrar?.lookupKey(forAsset: changeCameraIconPath)
-            let imagePath = Bundle.main.path(forResource: key, ofType: nil)!
-            SwiftFlutterBarcodeScannerPlugin.cameraSwitchImage = UIImage(contentsOfFile: imagePath)!
+            if changeCameraIconPath != ""{
+                let key = registrar?.lookupKey(forAsset: changeCameraIconPath)
+                let imagePath = Bundle.main.path(forResource: key, ofType: nil)!
+                SwiftFlutterBarcodeScannerPlugin.cameraSwitchImage = UIImage(contentsOfFile: imagePath)!
+            }
+            
         }
 
 
@@ -237,59 +246,68 @@ class BarcodeScannerViewController: UIViewController {
     /// Create and return flash button
     private lazy var flashIcon : UIButton! = {
         let flashButton = UIButton()
+        let iconSizeString = SwiftFlutterBarcodeScannerPlugin.iconSize
+        let flashOffIconImagePath = SwiftFlutterBarcodeScannerPlugin.flashOffIconPath
         flashButton.setTitle("Flash",for:.normal)
         flashButton.translatesAutoresizingMaskIntoConstraints=false
         let originalImage = UIImage(named: "ic_flash_off", in: Bundle(for: SwiftFlutterBarcodeScannerPlugin.self), compatibleWith: nil)
         
         flashButton.setImage(originalImage,for:.normal)
         
-        flashButton.setImage(SwiftFlutterBarcodeScannerPlugin.flashOffIconImage,for: .normal)
+        if flashOffIconImagePath != "" {
+            flashButton.setImage(SwiftFlutterBarcodeScannerPlugin.flashOffIconImage,for: .normal)
+        }
+        
+        
         
         flashButton.addTarget(self, action: #selector(BarcodeScannerViewController.flashButtonClicked), for: .touchUpInside)
         
-//        let iconSizeString = SwiftFlutterBarcodeScannerPlugin.iconSize
-//        
-//        if iconSizeString != "0", let iconSize = NumberFormatter().number(from: iconSizeString){
-//            let iconSizeCGFloat = CGFloat(truncating: iconSize)
-//            let resizedImage = resizeImage(image: originalImage!, targetSize: CGSize(width: iconSizeCGFloat, height: iconSizeCGFloat))
-//            flashButton.widthAnchor.constraint(equalToConstant: iconSizeCGFloat).isActive = true
-//            flashButton.heightAnchor.constraint(equalToConstant: iconSizeCGFloat).isActive = true
-//            
-//            flashButton.setImage(resizedImage, for: .normal)
-//            
-//        }
+       
+       
+        if iconSizeString != "0", let iconSize = NumberFormatter().number(from: iconSizeString){
+            let iconSizeCGFloat = CGFloat(truncating: iconSize)
+            flashButton.widthAnchor.constraint(equalToConstant: iconSizeCGFloat).isActive = true
+            flashButton.heightAnchor.constraint(equalToConstant: iconSizeCGFloat).isActive = true
+            if flashOffIconImagePath != "" {
+                let resizedImage = resizeImage(image: SwiftFlutterBarcodeScannerPlugin.flashOffIconImage!, targetSize: CGSize(width: iconSizeCGFloat, height: iconSizeCGFloat))
+                flashButton.setImage(resizedImage, for: .normal)
+            }else{
+                let resizedImage = resizeImage(image: originalImage!, targetSize: CGSize(width: iconSizeCGFloat, height: iconSizeCGFloat))
+                flashButton.setImage(resizedImage, for: .normal)
+            }
+        }
         return flashButton
     }()
     
     /// Create and return switch camera button
     private lazy var switchCameraButton : UIButton! = {
         let button = UIButton()
+        let iconSizeString = SwiftFlutterBarcodeScannerPlugin.iconSize
+        let changeCameraIconPath = SwiftFlutterBarcodeScannerPlugin.changeCameraIconPath
 
         button.translatesAutoresizingMaskIntoConstraints = false
         let originalImage = UIImage(named: "ic_switch_camera", in: Bundle(for: SwiftFlutterBarcodeScannerPlugin.self), compatibleWith: nil)
 
         button.setImage(originalImage,for: .normal)
         
-        button.setImage(SwiftFlutterBarcodeScannerPlugin.cameraSwitchImage,for: .normal)
-        
-        
-        
+        if changeCameraIconPath != "" {
+            button.setImage(SwiftFlutterBarcodeScannerPlugin.cameraSwitchImage,for: .normal)
+        }
         
 //        button.addTarget(self, action: #selector(BarcodeScannerViewController.switchCameraButtonClicked), for: .touchUpInside)
         
-        let iconSizeString = SwiftFlutterBarcodeScannerPlugin.iconSize
-        let changeCameraIconPath = SwiftFlutterBarcodeScannerPlugin.changeCameraIconPath
-
-//        let image = UIImage (flutterEngine: flutterEngine, assetsPath: changeCameraIconPath)
-        
-//        if iconSizeString != "0", let iconSize = NumberFormatter().number(from: iconSizeString){
-//            let iconSizeCGFloat = CGFloat(truncating: iconSize)
-//            let resizedImage = resizeImage(image: originalImage!, targetSize: CGSize(width: iconSizeCGFloat, height: iconSizeCGFloat))
-//            button.widthAnchor.constraint(equalToConstant: iconSizeCGFloat).isActive = true
-//            button.heightAnchor.constraint(equalToConstant: iconSizeCGFloat).isActive = true
-//            button.setImage(resizedImage, for: .normal)
-//            
-//        }
+        if iconSizeString != "0", let iconSize = NumberFormatter().number(from: iconSizeString){
+            let iconSizeCGFloat = CGFloat(truncating: iconSize)
+            button.widthAnchor.constraint(equalToConstant: iconSizeCGFloat).isActive = true
+            button.heightAnchor.constraint(equalToConstant: iconSizeCGFloat).isActive = true
+            if changeCameraIconPath != "" {
+                let resizedImage = resizeImage(image: SwiftFlutterBarcodeScannerPlugin.cameraSwitchImage!, targetSize: CGSize(width: iconSizeCGFloat, height: iconSizeCGFloat))
+                button.setImage(resizedImage, for: .normal)
+            }else{
+                let resizedImage = resizeImage(image: originalImage!, targetSize: CGSize(width: iconSizeCGFloat, height: iconSizeCGFloat))
+                button.setImage(resizedImage, for: .normal)
+            }
+        }
         
         return button
     }()
@@ -531,13 +549,55 @@ class BarcodeScannerViewController: UIViewController {
     }
     
     private func flashIconOff() {
-        flashIcon.setImage(UIImage(named: "ic_flash_off", in: Bundle(for: SwiftFlutterBarcodeScannerPlugin.self), compatibleWith: nil),for:.normal)
-        flashIcon.setImage(SwiftFlutterBarcodeScannerPlugin.flashOffIconImage,for: .normal)
+        let originalImage = UIImage(named: "ic_flash_off", in: Bundle(for: SwiftFlutterBarcodeScannerPlugin.self), compatibleWith: nil)
+        flashIcon.setImage(originalImage ,for:.normal)
+        
+        let iconSizeString = SwiftFlutterBarcodeScannerPlugin.iconSize
+        let flashOffIconImagePath = SwiftFlutterBarcodeScannerPlugin.flashOffIconPath
+        
+        if flashOffIconImagePath != "" {
+            flashIcon.setImage(SwiftFlutterBarcodeScannerPlugin.flashOffIconImage,for: .normal)
+        }
+        
+        
+        if iconSizeString != "0", let iconSize = NumberFormatter().number(from: iconSizeString){
+            let iconSizeCGFloat = CGFloat(truncating: iconSize)
+            flashIcon.widthAnchor.constraint(equalToConstant: iconSizeCGFloat).isActive = true
+            flashIcon.heightAnchor.constraint(equalToConstant: iconSizeCGFloat).isActive = true
+            if flashOffIconImagePath != "" {
+                let resizedImage = resizeImage(image: SwiftFlutterBarcodeScannerPlugin.flashOffIconImage!, targetSize: CGSize(width: iconSizeCGFloat, height: iconSizeCGFloat))
+                flashIcon.setImage(resizedImage, for: .normal)
+            }else{
+                let resizedImage = resizeImage(image: originalImage!, targetSize: CGSize(width: iconSizeCGFloat, height: iconSizeCGFloat))
+                flashIcon.setImage(resizedImage, for: .normal)
+            }
+        }
     }
     
     private func flashIconOn() {
+        let originalImage = UIImage(named: "ic_flash_on", in: Bundle(for: SwiftFlutterBarcodeScannerPlugin.self), compatibleWith: nil)
         flashIcon.setImage(UIImage(named: "ic_flash_on", in: Bundle(for: SwiftFlutterBarcodeScannerPlugin.self), compatibleWith: nil),for:.normal)
-        flashIcon.setImage(SwiftFlutterBarcodeScannerPlugin.flashIconImage,for: .normal)
+        let iconSizeString = SwiftFlutterBarcodeScannerPlugin.iconSize
+        let flashIconImagePath = SwiftFlutterBarcodeScannerPlugin.flashIconPath
+        
+        if flashIconImagePath != "" {
+            flashIcon.setImage(SwiftFlutterBarcodeScannerPlugin.flashIconImage,for: .normal)
+        }
+        
+        
+        if iconSizeString != "0", let iconSize = NumberFormatter().number(from: iconSizeString){
+            let iconSizeCGFloat = CGFloat(truncating: iconSize)
+            flashIcon.widthAnchor.constraint(equalToConstant: iconSizeCGFloat).isActive = true
+            flashIcon.heightAnchor.constraint(equalToConstant: iconSizeCGFloat).isActive = true
+            if flashIconImagePath != "" {
+                let resizedImage = resizeImage(image: SwiftFlutterBarcodeScannerPlugin.flashIconImage!, targetSize: CGSize(width: iconSizeCGFloat, height: iconSizeCGFloat))
+                flashIcon.setImage(resizedImage, for: .normal)
+            }else{
+                let resizedImage = resizeImage(image: originalImage!, targetSize: CGSize(width: iconSizeCGFloat, height: iconSizeCGFloat))
+                flashIcon.setImage(resizedImage, for: .normal)
+            }
+        }
+        
     }
     
 //    private func setFlashStatus(device: AVCaptureDevice, mode: AVCaptureDevice.TorchMode) {
