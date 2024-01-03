@@ -46,8 +46,13 @@ public class FlutterBarcodeScannerPlugin implements MethodCallHandler, ActivityR
     private static final String TAG = FlutterBarcodeScannerPlugin.class.getSimpleName();
     private static final int RC_BARCODE_CAPTURE = 9001;
     public static String lineColor = "";
+    public static String flashIconPath = "";
+    public static String flashOffIconPath = "";
+    public static String changeCameraIconPath = "";
     public static boolean isShowFlashIcon = false;
     public static boolean isContinuousScan = false;
+    public static String iconSize = "";
+    public static String fontSize = "";
     static EventChannel.EventSink barcodeStream;
     private EventChannel eventChannel;
 
@@ -88,6 +93,8 @@ public class FlutterBarcodeScannerPlugin implements MethodCallHandler, ActivityR
         instance.createPluginSetup(registrar.messenger(), applicationContext, activity, registrar, null);
     }
 
+
+
     @Override
     public void onMethodCall(@NonNull MethodCall call, @NonNull Result result) {
         try {
@@ -99,7 +106,12 @@ public class FlutterBarcodeScannerPlugin implements MethodCallHandler, ActivityR
                 }
                 arguments = (Map<String, Object>) call.arguments;
                 lineColor = (String) arguments.get("lineColor");
+                flashIconPath = (String) arguments.get("flashIconPath");
+                flashOffIconPath = (String) arguments.get("flashOffIconPath");
+                changeCameraIconPath = (String) arguments.get("changeCameraIconPath");
                 isShowFlashIcon = (boolean) arguments.get("isShowFlashIcon");
+                iconSize = (String) arguments.get("iconSize");
+                fontSize = (String) arguments.get("fontSize");
                 if (null == lineColor || lineColor.equalsIgnoreCase("")) {
                     lineColor = "#DC143C";
                 }
@@ -115,16 +127,17 @@ public class FlutterBarcodeScannerPlugin implements MethodCallHandler, ActivityR
 
                 isContinuousScan = (boolean) arguments.get("isContinuousScan");
 
-                startBarcodeScannerActivityView((String) arguments.get("cancelButtonText"), isContinuousScan);
+                startBarcodeScannerActivityView((String) arguments.get("cancelButtonText"), isContinuousScan, iconSize, changeCameraIconPath, flashIconPath, flashOffIconPath, fontSize);
             }
         } catch (Exception e) {
             Log.e(TAG, "onMethodCall: " + e.getLocalizedMessage());
         }
     }
 
-    private void startBarcodeScannerActivityView(String buttonText, boolean isContinuousScan) {
+    private void startBarcodeScannerActivityView(String buttonText, boolean isContinuousScan, String iconSize, String changeCameraIconPath, String flashIconPath, String flashOffIconPath, String fontSize ) {
         try {
-            Intent intent = new Intent(activity, BarcodeCaptureActivity.class).putExtra("cancelButtonText", buttonText);
+            Intent intent = new Intent(activity, BarcodeCaptureActivity.class).putExtra("cancelButtonText", buttonText).putExtra("iconSize", iconSize).putExtra("flashIconPath", flashIconPath).putExtra("changeCameraIconPath", changeCameraIconPath).putExtra("flashOffIconPath", flashOffIconPath).putExtra("fontSize", fontSize);
+            
             if (isContinuousScan) {
                 activity.startActivity(intent);
             } else {

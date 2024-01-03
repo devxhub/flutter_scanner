@@ -24,6 +24,9 @@
       <excludeFolder url="file://$MODULE_DIR$/flutter_plugin/.dart_tool" />
       <excludeFolder url="file://$MODULE_DIR$/flutter_plugin/.pub" />
       <excludeFolder url="file://$MODULE_DIR$/flutter_plugin/build" />
+      <excludeFolder url="file://$MODULE_DIR$/example2/build" />
+      <excludeFolder url="file://$MODULE_DIR$/example2/.dart_tool" />
+      <excludeFolder url="file://$MODULE_DIR$/example2/.pub" />
     </content>
     <orderEntry type="jdk" jdkName="Android API 29 Platform" jdkType="Android SDK" />
     <orderEntry type="sourceFolder" forTests="false" />

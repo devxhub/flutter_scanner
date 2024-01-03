@@ -27,18 +27,21 @@ class _MyAppState extends State<MyApp> {
 
   Future<void> scanQR() async {
     String barcodeScanRes;
-    // Platform messages may fail, so we use a try/catch PlatformException.
     try {
       barcodeScanRes = await FlutterBarcodeScanner.scanBarcode(
-          '#ff6666', 'Cancel', true, ScanMode.QR);
+          '#ff6666',
+          'Cancel',
+          true,
+          ScanMode.QR,
+          0,
+          20,
+          "assets/flash.png",
+          "assets/flashoff.png",
+          "assets/camera.png");
       print(barcodeScanRes);
     } on PlatformException {
       barcodeScanRes = 'Failed to get platform version.';
     }
-
-    // If the widget was removed from the tree while the asynchronous platform
-    // message was in flight, we want to discard the reply rather than calling
-    // setState to update our non-existent appearance.
     if (!mounted) return;
 
     setState(() {
@@ -52,15 +55,20 @@ class _MyAppState extends State<MyApp> {
     // Platform messages may fail, so we use a try/catch PlatformException.
     try {
       barcodeScanRes = await FlutterBarcodeScanner.scanBarcode(
-          '#ff6666', 'Cancel', true, ScanMode.BARCODE);
+          '#ff6666',
+          'Cancel',
+          true,
+          ScanMode.BARCODE,
+          50,
+          20,
+          "assets/flashoff.png",
+          "assets/flash.png",
+          "assets/camera.png");
       print(barcodeScanRes);
     } on PlatformException {
       barcodeScanRes = 'Failed to get platform version.';
     }
 
-    // If the widget was removed from the tree while the asynchronous platform
-    // message was in flight, we want to discard the reply rather than calling
-    // setState to update our non-existent appearance.
     if (!mounted) return;
 
     setState(() {
@@ -71,6 +79,7 @@ class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+        theme: ThemeData.dark(),
         home: Scaffold(
             appBar: AppBar(title: const Text('Barcode scan')),
             body: Builder(builder: (BuildContext context) {
@@ -90,7 +99,12 @@ class _MyAppState extends State<MyApp> {
                             onPressed: () => startBarcodeScanStream(),
                             child: Text('Start barcode scan stream')),
                         Text('Scan result : $_scanBarcode\n',
-                            style: TextStyle(fontSize: 20))
+                            style: TextStyle(fontSize: 20)),
+                        Image.asset(
+                          "assets/flash.png",
+                          width: 20,
+                          height: 20,
+                        )
                       ]));
             })));
   }
