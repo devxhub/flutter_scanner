@@ -19,25 +19,40 @@ class _MyAppState extends State<MyApp> {
     super.initState();
   }
 
-  Future<void> startBarcodeScanStream() async {
-    FlutterBarcodeScanner.getBarcodeStreamReceiver(
-            '#ff6666', 'Cancel', true, ScanMode.BARCODE)!
-        .listen((barcode) => print(barcode));
-  }
+  // Future<void> startBarcodeScanStream() async {
+  //   FlutterBarcodeScanner.getBarcodeStreamReceiver(
+  //           '#ff6666', 'Cancel', true, ScanMode.BARCODE)!
+  //       .listen((barcode) => print(barcode));
+  // }
 
   Future<void> scanQR() async {
+    // String barcodeScanRes;
+    // try {
+    //   barcodeScanRes = await FlutterBarcodeScanner.scanBarcode(
+    //       '#ff6666',
+    //       'Cancel',
+    //       true,
+    //       ScanMode.QR,
+    //       50,
+    //       20,
+    //       "assets/flash.png",
+    //       "assets/flashoff.png",
+    //       "assets/camera.png");
+    //   print(barcodeScanRes);
+    // } on PlatformException {
+    //   barcodeScanRes = 'Failed to get platform version.';
+    // }
+    // if (!mounted) return;
+
+    // setState(() {
+    //   _scanBarcode = barcodeScanRes;
+    // });
+  }
+
+  Future<void> scanQR2() async {
     String barcodeScanRes;
     try {
-      barcodeScanRes = await FlutterBarcodeScanner.scanBarcode(
-          '#ff6666',
-          'Cancel',
-          true,
-          ScanMode.QR,
-          0,
-          20,
-          "assets/flash.png",
-          "assets/flashoff.png",
-          "assets/camera.png");
+      barcodeScanRes = await FlutterBarcodeScanner.scanBarcode();
       print(barcodeScanRes);
     } on PlatformException {
       barcodeScanRes = 'Failed to get platform version.';
@@ -51,29 +66,29 @@ class _MyAppState extends State<MyApp> {
 
   // Platform messages are asynchronous, so we initialize in an async method.
   Future<void> scanBarcodeNormal() async {
-    String barcodeScanRes;
-    // Platform messages may fail, so we use a try/catch PlatformException.
-    try {
-      barcodeScanRes = await FlutterBarcodeScanner.scanBarcode(
-          '#ff6666',
-          'Cancel',
-          true,
-          ScanMode.BARCODE,
-          50,
-          20,
-          "assets/flashoff.png",
-          "assets/flash.png",
-          "assets/camera.png");
-      print(barcodeScanRes);
-    } on PlatformException {
-      barcodeScanRes = 'Failed to get platform version.';
-    }
+    // String barcodeScanRes;
+    // // Platform messages may fail, so we use a try/catch PlatformException.
+    // try {
+    //   barcodeScanRes = await FlutterBarcodeScanner.scanBarcode(
+    //       '#ff6666',
+    //       'Cancel',
+    //       isShowFlashIcon: true,
+    //       scanMode: ScanMode.BARCODE,
+    //       iconSize: 50,
+    //       20,
+    //       "assets/flashoff.png",
+    //       "assets/flash.png",
+    //       "assets/camera.png");
+    //   print(barcodeScanRes);
+    // } on PlatformException {
+    //   barcodeScanRes = 'Failed to get platform version.';
+    // }
 
-    if (!mounted) return;
+    // if (!mounted) return;
 
-    setState(() {
-      _scanBarcode = barcodeScanRes;
-    });
+    // setState(() {
+    //   _scanBarcode = barcodeScanRes;
+    // });
   }
 
   @override
@@ -96,8 +111,11 @@ class _MyAppState extends State<MyApp> {
                             onPressed: () => scanQR(),
                             child: Text('Start QR scan')),
                         ElevatedButton(
-                            onPressed: () => startBarcodeScanStream(),
-                            child: Text('Start barcode scan stream')),
+                            onPressed: () => scanQR2(),
+                            child: Text('Start QR scan 2')),
+                        // ElevatedButton(
+                        //     onPressed: () => startBarcodeScanStream(),
+                        //     child: Text('Start barcode scan stream')),
                         Text('Scan result : $_scanBarcode\n',
                             style: TextStyle(fontSize: 20)),
                         Image.asset(

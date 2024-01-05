@@ -133,7 +133,7 @@ public final class BarcodeCaptureActivity extends AppCompatActivity implements B
 
             Button btnBarcodeCaptureCancel = findViewById(R.id.btnBarcodeCaptureCancel);
             btnBarcodeCaptureCancel.setText(buttonText);
-            if(fontSize != "0"){
+            if(Float.valueOf(fontSize) > 0.0){
             btnBarcodeCaptureCancel.setTextSize(Float.valueOf(fontSize));
             }
             
@@ -142,11 +142,11 @@ public final class BarcodeCaptureActivity extends AppCompatActivity implements B
             imgViewBarcodeCaptureUseFlash = findViewById(R.id.imgViewBarcodeCaptureUseFlash);
             imgViewBarcodeCaptureUseFlash.setOnClickListener(this);
             imgViewBarcodeCaptureUseFlash.setVisibility(FlutterBarcodeScannerPlugin.isShowFlashIcon ? View.VISIBLE : View.GONE);
-             if(iconSize != "0"){
+             if(Integer.valueOf(iconSize) > 0){
             imgViewBarcodeCaptureUseFlash.getLayoutParams().width = Integer.valueOf(iconSize);
             imgViewBarcodeCaptureUseFlash.getLayoutParams().height = Integer.valueOf(iconSize);
              }
-            if (!flashIconPath.equals("")) {
+            if (!flashOffIconPath.equals("")) {
                 try {
                     InputStream is = getAssets().open("flutter_assets/" + flashOffIconPath);
                     Drawable d = Drawable.createFromStream(is, null);
@@ -159,7 +159,7 @@ public final class BarcodeCaptureActivity extends AppCompatActivity implements B
 
             imgViewSwitchCamera = findViewById(R.id.imgViewSwitchCamera);
             imgViewSwitchCamera.setOnClickListener(this);
- if(iconSize != "0"){
+ if(Integer.valueOf(iconSize) > 0){
             imgViewSwitchCamera.getLayoutParams().width = Integer.valueOf(iconSize);
             imgViewSwitchCamera.getLayoutParams().height = Integer.valueOf(iconSize);
  }
