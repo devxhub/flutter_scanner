@@ -2,7 +2,7 @@
 # To learn more about a Podspec see http://guides.cocoapods.org/syntax/podspec.html
 #
 Pod::Spec.new do |s|
-  s.name             = 'flutter_barcode_scanner'
+  s.name             = 'flutter_barcode_scanner_devxhub'
   s.version          = '2.0.0'
   s.summary          = 'A new Flutter plugin supports barcode scanning on both Android and iOS.'
   s.description      = <<-DESC
