@@ -24,34 +24,32 @@ class FlutterBarcodeScanner {
   /// displayed if [isShowFlashIcon] is true. The text of the cancel button can
   /// be customized with the [cancelButtonText] string.
   static Future<String> scanBarcode(
-      String lineColor,
-      String cancelButtonText,
-      bool isShowFlashIcon,
-      ScanMode scanMode,
-      int iconSize,
-      double fontSize,
-      String flashIconPath,
-      String flashOffIconPath,
-      String changeCameraIconPath) async {
-    if (cancelButtonText.isEmpty) {
-      cancelButtonText = 'Cancel';
-    }
-
+      {String? lineColor,
+      String? cancelButtonText,
+      bool? isShowFlashIcon,
+      ScanMode? scanMode,
+      int? iconSize,
+      double? fontSize,
+      String? flashIconPath,
+      String? flashOffIconPath,
+      String? changeCameraIconPath}) async {
     // Pass params to the plugin
     Map params = <String, dynamic>{
-      'lineColor': lineColor,
-      'cancelButtonText': cancelButtonText,
-      'isShowFlashIcon': isShowFlashIcon,
-      'flashIconPath': flashIconPath,
-      'flashOffIconPath': flashOffIconPath,
-      'changeCameraIconPath': changeCameraIconPath,
+      'lineColor': lineColor ?? '#ff6666',
+      'cancelButtonText': cancelButtonText ?? 'Cancel',
+      'isShowFlashIcon': isShowFlashIcon ?? true,
+      'flashIconPath': flashIconPath ?? "",
+      'flashOffIconPath': flashOffIconPath ?? "",
+      'changeCameraIconPath': changeCameraIconPath ?? "",
       'isContinuousScan': false,
-      'scanMode': scanMode.index,
-      'iconSize': iconSize.toString(),
-      'fontSize': fontSize.toString()
+      'scanMode': scanMode?.index ?? 0,
+      'iconSize': iconSize?.toString() ?? "0",
+      'fontSize': fontSize?.toString() ?? "0",
     };
 
-    /// Get barcode scan result
+    print(params);
+
+    // / Get barcode scan result
     final barcodeResult =
         await _channel.invokeMethod('scanBarcode', params) ?? '';
     return barcodeResult;
@@ -64,25 +62,25 @@ class FlutterBarcodeScanner {
   /// displayed if [isShowFlashIcon] is true. The text of the cancel button can
   /// be customized with the [cancelButtonText] string. Returns a stream of
   /// detected barcode strings.
-  static Stream? getBarcodeStreamReceiver(String lineColor,
-      String cancelButtonText, bool isShowFlashIcon, ScanMode scanMode) {
-    if (cancelButtonText.isEmpty) {
-      cancelButtonText = 'Cancel';
-    }
+  // static Stream? getBarcodeStreamReceiver(String lineColor,
+  //     String cancelButtonText, bool isShowFlashIcon, ScanMode scanMode) {
+  //   if (cancelButtonText.isEmpty) {
+  //     cancelButtonText = 'Cancel';
+  //   }
 
-    // Pass params to the plugin
-    Map params = <String, dynamic>{
-      'lineColor': lineColor,
-      'cancelButtonText': cancelButtonText,
-      'isShowFlashIcon': isShowFlashIcon,
-      'isContinuousScan': true,
-      'scanMode': scanMode.index
-    };
+  //   // Pass params to the plugin
+  //   Map params = <String, dynamic>{
+  //     'lineColor': lineColor,
+  //     'cancelButtonText': cancelButtonText,
+  //     'isShowFlashIcon': isShowFlashIcon,
+  //     'isContinuousScan': true,
+  //     'scanMode': scanMode.index
+  //   };
 
-    // Invoke method to open camera, and then create an event channel which will
-    // return a stream
-    _channel.invokeMethod('scanBarcode', params);
-    _onBarcodeReceiver ??= _eventChannel.receiveBroadcastStream();
-    return _onBarcodeReceiver;
-  }
+  //   // Invoke method to open camera, and then create an event channel which will
+  //   // return a stream
+  //   _channel.invokeMethod('scanBarcode', params);
+  //   _onBarcodeReceiver ??= _eventChannel.receiveBroadcastStream();
+  //   return _onBarcodeReceiver;
+  // }
 }
