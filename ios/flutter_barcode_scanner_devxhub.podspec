@@ -3,10 +3,10 @@
 #
 Pod::Spec.new do |s|
   s.name             = 'flutter_scanner'
-  s.version          = '0.0.1'
-  s.summary          = 'A new Flutter plugin supports barcode scanning on both Android and iOS.'
+  s.version          = '1.0.0'
+  s.summary          = 'The Flutter Scanner plugin offers seamless barcode and QR code scanning capabilities for Flutter apps on Android and iOS. It supports a range of code types, enhancing mobile app functionality.'
   s.description      = <<-DESC
-A new Flutter plugin supports barcode scanning on both Android and iOS.
+  The Flutter Scanner plugin offers seamless barcode and QR code scanning capabilities for Flutter apps on Android and iOS. It supports a range of code types, enhancing mobile app functionality.
                        DESC
   s.homepage         = 'https://github.com/devxhub/flutter_scanner'
   s.license          = { :file => '../LICENSE' }

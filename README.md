@@ -61,7 +61,7 @@ After making the changes in Android ans iOS add flutter_scanner to `pubspec.yaml
 ```  
 dependencies:
   ...
-  flutter_scanner: ^0.0.1
+  flutter_scanner: ^1.0.0
 ```
 
 
