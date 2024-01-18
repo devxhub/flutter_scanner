@@ -11,10 +11,10 @@ enum ScanMode { QR, BARCODE, DEFAULT }
 /// Flutter project.
 class FlutterScanner {
   static const MethodChannel _channel =
-      MethodChannel('flutter_scanner');
+      MethodChannel('flutter_scanner_devxhub');
 
   static const EventChannel _eventChannel =
-      EventChannel('flutter_scanner_receiver');
+      EventChannel('flutter_scanner_devxhub_receiver');
 
   static Stream? _onBarcodeReceiver;
 
@@ -55,13 +55,13 @@ class FlutterScanner {
     return barcodeResult;
   }
 
-  /// Returns a continuous stream of barcode scans until the user cancels the
-  /// operation.
-  ///
-  /// Shows a scan line with [lineColor] over a scan window. A flash icon is
-  /// displayed if [isShowFlashIcon] is true. The text of the cancel button can
-  /// be customized with the [cancelButtonText] string. Returns a stream of
-  /// detected barcode strings.
+  // / Returns a continuous stream of barcode scans until the user cancels the
+  // / operation.
+  // /
+  // / Shows a scan line with [lineColor] over a scan window. A flash icon is
+  // / displayed if [isShowFlashIcon] is true. The text of the cancel button can
+  // / be customized with the [cancelButtonText] string. Returns a stream of
+  // / detected barcode strings.
   // static Stream? getBarcodeStreamReceiver(String lineColor,
   //     String cancelButtonText, bool isShowFlashIcon, ScanMode scanMode) {
   //   if (cancelButtonText.isEmpty) {

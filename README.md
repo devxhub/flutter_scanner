@@ -1,4 +1,4 @@
-# flutter_scanner by DEVxHUB
+# flutter_scanner_devxhub by DEVxHUB
 
 A plugin for Flutter apps that adds barcode scanning support on both Android and iOS.
 
@@ -57,18 +57,18 @@ To do that open the Xcode and add camera usage description in `Info.plist`.
 ```
 
 
-After making the changes in Android ans iOS add flutter_scanner to `pubspec.yaml`
+After making the changes in Android ans iOS add flutter_scanner_devxhub to `pubspec.yaml`
 ```  
 dependencies:
   ...
-  flutter_scanner: ^1.0.0
+  flutter_scanner_devxhub: ^1.0.0
 ```
 
 
 1. You need to import the package first.
 
 ```
-import 'package:flutter_scanner/flutter_scanner.dart';
+import 'package:flutter_scanner_devxhub/flutter_scanner_devxhub.dart';
 ```
 
     

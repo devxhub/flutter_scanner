@@ -1,21 +1,21 @@
 PODS:
   - Flutter (1.0.0)
-  - flutter_scanner (1.0.0):
+  - flutter_scanner_devxhub (1.0.0):
     - Flutter
 
 DEPENDENCIES:
   - Flutter (from `Flutter`)
-  - flutter_scanner (from `.symlinks/plugins/flutter_scanner/ios`)
+  - flutter_scanner_devxhub (from `.symlinks/plugins/flutter_scanner_devxhub/ios`)
 
 EXTERNAL SOURCES:
   Flutter:
     :path: Flutter
-  flutter_scanner:
-    :path: ".symlinks/plugins/flutter_scanner/ios"
+  flutter_scanner_devxhub:
+    :path: ".symlinks/plugins/flutter_scanner_devxhub/ios"
 
 SPEC CHECKSUMS:
   Flutter: f04841e97a9d0b0a8025694d0796dd46242b2854
-  flutter_scanner: 5e0472bb076e36410bd4dbf7a9136137036de1a1
+  flutter_scanner_devxhub: 5e0472bb076e36410bd4dbf7a9136137036de1a1
 
 PODFILE CHECKSUM: 70d9d25280d0dd177a5f637cdb0f0b0b12c6a189
 

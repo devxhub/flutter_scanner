@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_scanner/flutter_scanner.dart';
+import 'package:flutter_scanner_devxhub/flutter_scanner_devxhub.dart';
 
 void main() => runApp(MyApp());
 

@@ -2,7 +2,7 @@
 # To learn more about a Podspec see http://guides.cocoapods.org/syntax/podspec.html
 #
 Pod::Spec.new do |s|
-  s.name             = 'flutter_scanner'
+  s.name             = 'flutter_scanner_devxhub'
   s.version          = '1.0.0'
   s.summary          = 'The Flutter Scanner plugin offers seamless barcode and QR code scanning capabilities for Flutter apps on Android and iOS. It supports a range of code types, enhancing mobile app functionality.'
   s.description      = <<-DESC
