@@ -1,4 +1,4 @@
-# flutter_barcode_scanner by DevXhub
+# flutter_scanner by DEVxHUB
 
 A plugin for Flutter apps that adds barcode scanning support on both Android and iOS.
 
@@ -6,7 +6,7 @@ A plugin for Flutter apps that adds barcode scanning support on both Android and
 
 
 
-## Try example
+## Example
 Just clone or download the repository, open the project in `Android Studio/ VS Code`, open `pubspec.yaml` and click on `Packages get`.
 Connect device and hit `run`. 
 To run on iPhone you need to run from Xcode first time and just make `pod install` in `example/ios` then run from Xcode.
@@ -57,25 +57,25 @@ To do that open the Xcode and add camera usage description in `Info.plist`.
 ```
 
 
-After making the changes in Android ans iOS add flutter_barcode_scanner to `pubspec.yaml`
+After making the changes in Android ans iOS add flutter_scanner to `pubspec.yaml`
 ```  
 dependencies:
   ...
-  flutter_barcode_scanner: ^2.0.0
+  flutter_scanner: ^0.0.1
 ```
 
 
 1. You need to import the package first.
 
 ```
-import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
+import 'package:flutter_scanner/flutter_scanner.dart';
 ```
 
     
 2. Then use the `scanBarcode` method to access barcode scanning.
     
 ```
-String barcodeScanRes = await FlutterBarcodeScanner.scanBarcode(
+String barcodeScanRes = await FlutterScanner.scanBarcode(
           lineColor: '#ff6666',
           cancelButtonText: 'Cancel',
           isShowFlashIcon: true,

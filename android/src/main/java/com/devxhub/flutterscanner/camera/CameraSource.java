@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.amolg.flutterbarcodescanner.camera;
+package com.devxhub.flutterscanner.camera;
 
 import android.Manifest;
 import android.annotation.SuppressLint;

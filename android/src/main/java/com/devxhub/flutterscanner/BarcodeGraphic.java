@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.amolg.flutterbarcodescanner;
+package com.devxhub.flutterscanner;
 
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -21,7 +21,7 @@ import android.graphics.Paint;
 import android.graphics.RectF;
 
 
-import com.amolg.flutterbarcodescanner.camera.GraphicOverlay;
+import com.devxhub.flutterscanner.camera.GraphicOverlay;
 import com.google.android.gms.vision.barcode.Barcode;
 
 /**

@@ -13,12 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.amolg.flutterbarcodescanner;
+package com.devxhub.flutterscanner;
 
 import android.content.Context;
 import androidx.annotation.UiThread;
 
-import com.amolg.flutterbarcodescanner.camera.GraphicOverlay;
+import com.devxhub.flutterscanner.camera.GraphicOverlay;
 import com.google.android.gms.vision.Detector;
 import com.google.android.gms.vision.Tracker;
 import com.google.android.gms.vision.barcode.Barcode;

@@ -1,5 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.amolg.flutterbarcodescanner">
+    package="com.devxhub.flutterscanner">
 
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-feature android:name="android.hardware.camera" />
@@ -7,6 +7,6 @@
     <application
         android:largeHeap="true"
         android:theme="@style/Theme.AppCompat.NoActionBar">
-        <activity android:name="com.amolg.flutterbarcodescanner.BarcodeCaptureActivity" />
+        <activity android:name="com.devxhub.flutterscanner.BarcodeCaptureActivity" />
     </application>
 </manifest>

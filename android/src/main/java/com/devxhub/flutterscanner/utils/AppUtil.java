@@ -1,4 +1,4 @@
-package com.amolg.flutterbarcodescanner.utils;
+package com.devxhub.flutterscanner.utils;
 
 import android.content.Context;
 import android.util.DisplayMetrics;

@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_barcode_scanner_devxhub/flutter_barcode_scanner.dart';
+import 'package:flutter_scanner/flutter_scanner.dart';
 
 void main() => runApp(MyApp());
 
@@ -20,7 +20,7 @@ class _MyAppState extends State<MyApp> {
   }
 
   // Future<void> startBarcodeScanStream() async {
-  //   FlutterBarcodeScanner.getBarcodeStreamReceiver(
+  //   FlutterScanner.getBarcodeStreamReceiver(
   //           '#ff6666', 'Cancel', true, ScanMode.BARCODE)!
   //       .listen((barcode) => print(barcode));
   // }
@@ -28,7 +28,7 @@ class _MyAppState extends State<MyApp> {
   Future<void> scanQR() async {
     // String barcodeScanRes;
     // try {
-    //   barcodeScanRes = await FlutterBarcodeScanner.scanBarcode(
+    //   barcodeScanRes = await FlutterScanner.scanBarcode(
     //       '#ff6666',
     //       'Cancel',
     //       true,
@@ -52,7 +52,7 @@ class _MyAppState extends State<MyApp> {
   Future<void> scanQR2() async {
     String barcodeScanRes;
     try {
-      barcodeScanRes = await FlutterBarcodeScanner.scanBarcode();
+      barcodeScanRes = await FlutterScanner.scanBarcode();
       print(barcodeScanRes);
     } on PlatformException {
       barcodeScanRes = 'Failed to get platform version.';
@@ -69,7 +69,7 @@ class _MyAppState extends State<MyApp> {
     // String barcodeScanRes;
     // // Platform messages may fail, so we use a try/catch PlatformException.
     // try {
-    //   barcodeScanRes = await FlutterBarcodeScanner.scanBarcode(
+    //   barcodeScanRes = await FlutterScanner.scanBarcode(
     //       '#ff6666',
     //       'Cancel',
     //       isShowFlashIcon: true,
