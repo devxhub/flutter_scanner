@@ -19,37 +19,58 @@ class _MyAppState extends State<MyApp> {
     super.initState();
   }
 
-  // Future<void> startBarcodeScanStream() async {
-  //   FlutterScanner.getBarcodeStreamReceiver(
-  //           '#ff6666', 'Cancel', true, ScanMode.BARCODE)!
-  //       .listen((barcode) => print(barcode));
-  // }
+  // Platform messages are asynchronous, so we initialize in an async method.
+  Future<void> scanBarcodeNormal() async {
+    String barcodeScanRes;
+    // Platform messages may fail, so we use a try/catch PlatformException.
+    try {
+      barcodeScanRes = await FlutterScanner.scanBarcode(
+          lineColor: '#ff6666',
+          cancelButtonText: 'Cancel',
+          isShowFlashIcon: true,
+          scanMode: ScanMode.BARCODE,
+          iconSize: 50,
+          fontSize: 20,
+          flashOffIconPath: "assets/flashoff.png",
+          flashIconPath: "assets/flash.png",
+          changeCameraIconPath: "assets/camera.png");
+      print(barcodeScanRes);
+    } on PlatformException {
+      barcodeScanRes = 'Failed to get platform version.';
+    }
 
-  Future<void> scanQR() async {
-    // String barcodeScanRes;
-    // try {
-    //   barcodeScanRes = await FlutterScanner.scanBarcode(
-    //       '#ff6666',
-    //       'Cancel',
-    //       true,
-    //       ScanMode.QR,
-    //       50,
-    //       20,
-    //       "assets/flash.png",
-    //       "assets/flashoff.png",
-    //       "assets/camera.png");
-    //   print(barcodeScanRes);
-    // } on PlatformException {
-    //   barcodeScanRes = 'Failed to get platform version.';
-    // }
-    // if (!mounted) return;
+    if (!mounted) return;
 
-    // setState(() {
-    //   _scanBarcode = barcodeScanRes;
-    // });
+    setState(() {
+      _scanBarcode = barcodeScanRes;
+    });
   }
 
-  Future<void> scanQR2() async {
+  Future<void> scanQR() async {
+    String barcodeScanRes;
+    try {
+      barcodeScanRes = await FlutterScanner.scanBarcode(
+          lineColor: '#ff6666',
+          cancelButtonText: 'Cancel',
+          isShowFlashIcon: true,
+          scanMode: ScanMode.QR,
+          iconSize: 50,
+          fontSize: 20,
+          flashOffIconPath: "assets/flashoff.png",
+          flashIconPath: "assets/flash.png",
+          changeCameraIconPath: "assets/camera.png");
+      print(barcodeScanRes);
+    } on PlatformException {
+      barcodeScanRes = 'Failed to get platform version.';
+    }
+    if (!mounted) return;
+
+    setState(() {
+      _scanBarcode = barcodeScanRes;
+    });
+  }
+
+  Future<void> scanQrDefault() async {
     String barcodeScanRes;
     try {
       barcodeScanRes = await FlutterScanner.scanBarcode();
@@ -62,33 +83,6 @@ class _MyAppState extends State<MyApp> {
     setState(() {
       _scanBarcode = barcodeScanRes;
     });
-  }
-
-  // Platform messages are asynchronous, so we initialize in an async method.
-  Future<void> scanBarcodeNormal() async {
-    // String barcodeScanRes;
-    // // Platform messages may fail, so we use a try/catch PlatformException.
-    // try {
-    //   barcodeScanRes = await FlutterScanner.scanBarcode(
-    //       '#ff6666',
-    //       'Cancel',
-    //       isShowFlashIcon: true,
-    //       scanMode: ScanMode.BARCODE,
-    //       iconSize: 50,
-    //       20,
-    //       "assets/flashoff.png",
-    //       "assets/flash.png",
-    //       "assets/camera.png");
-    //   print(barcodeScanRes);
-    // } on PlatformException {
-    //   barcodeScanRes = 'Failed to get platform version.';
-    // }
-
-    // if (!mounted) return;
-
-    // setState(() {
-    //   _scanBarcode = barcodeScanRes;
-    // });
   }
 
   @override
@@ -111,8 +105,8 @@ class _MyAppState extends State<MyApp> {
                             onPressed: () => scanQR(),
                             child: Text('Start QR scan')),
                         ElevatedButton(
-                            onPressed: () => scanQR2(),
-                            child: Text('Start QR scan 2')),
+                            onPressed: () => scanQrDefault(),
+                            child: Text('Start QR scan default')),
                         // ElevatedButton(
                         //     onPressed: () => startBarcodeScanStream(),
                         //     child: Text('Start barcode scan stream')),

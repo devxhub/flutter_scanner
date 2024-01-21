@@ -18,7 +18,7 @@ PLEASE FOLLOW **iOS** STEPS CAREFULLY
 
 ### Android
 
- Do not worry, you do not need to do anything.
+ You need to use `FlutterFragmentActivity` instead of `FlutterActivity` in `MainActivity.kt`
 
 ### iOS - Requires Swift support
 
@@ -61,7 +61,7 @@ After making the changes in Android ans iOS add flutter_scanner_devxhub to `pubs
 ```  
 dependencies:
   ...
-  flutter_scanner_devxhub: ^1.0.0
+  flutter_scanner_devxhub: ^1.0.1
 ```
 
 

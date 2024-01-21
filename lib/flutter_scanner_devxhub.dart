@@ -13,10 +13,10 @@ class FlutterScanner {
   static const MethodChannel _channel =
       MethodChannel('flutter_scanner_devxhub');
 
-  static const EventChannel _eventChannel =
-      EventChannel('flutter_scanner_devxhub_receiver');
+  // static const EventChannel _eventChannel =
+  //     EventChannel('flutter_scanner_devxhub_receiver');
 
-  static Stream? _onBarcodeReceiver;
+  // static Stream? _onBarcodeReceiver;
 
   /// Scan with the camera until a barcode is identified, then return.
   ///
