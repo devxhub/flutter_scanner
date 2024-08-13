@@ -29,6 +29,7 @@ class FlutterScanner {
       bool? isShowFlashIcon,
       ScanMode? scanMode,
       int? iconSize,
+      Duration? duration,
       double? fontSize,
       String? flashIconPath,
       String? flashOffIconPath,
@@ -45,6 +46,7 @@ class FlutterScanner {
       'scanMode': scanMode?.index ?? 0,
       'iconSize': iconSize?.toString() ?? "0",
       'fontSize': fontSize?.toString() ?? "0",
+      'duration': duration?.inMilliseconds.toString() ?? "0",
     };
 
     print(params);
@@ -52,6 +54,11 @@ class FlutterScanner {
     // / Get barcode scan result
     final barcodeResult =
         await _channel.invokeMethod('scanBarcode', params) ?? '';
+    return barcodeResult;
+  }
+
+  static Future<String> closeScanner() async {
+    final barcodeResult = await _channel.invokeMethod('closeScanner') ?? '';
     return barcodeResult;
   }
 

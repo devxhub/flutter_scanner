@@ -227,6 +227,37 @@ class BarcodeScannerViewController: UIViewController {
     private var isOrientationPortrait = true
     var screenHeight:CGFloat = 0
     let captureMetadataOutput = AVCaptureMetadataOutput()
+
+
+    var timer: Timer?
+    var secondsRemaining = 10
+
+    override public func viewDidLoad() {
+        super.viewDidLoad()
+        // ... other code ...
+
+        startTimer()
+    }
+
+    func startTimer() {
+        timer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { [weak self] timer in
+            guard let self = self else { return }
+            self.secondsRemaining   
+ -= 1
+
+            if self.secondsRemaining == 0 {
+                timer.invalidate()
+                self.handleTimeout()
+            }
+        }
+    }
+
+    func handleTimeout() {
+        // Handle timeout behavior, e.g., dismiss the scanner view, send a timeout event to Flutter plugin
+        dismiss(animated: true) {
+            SwiftFlutterBarcodeScannerPlugin.onBarcodeScanReceiver(barcode: "-1") // Or send a timeout event
+        }
+    }
     
     private lazy var xCor: CGFloat! = {
         return self.isOrientationPortrait ? (screenSize.width - (screenSize.width*0.8))/2 :
@@ -659,6 +690,7 @@ class BarcodeScannerViewController: UIViewController {
                 SwiftFlutterBarcodeScannerPlugin.onBarcodeScanReceiver(barcode: "-1")
             })
         }else{
+            // Todo 
             if self.delegate != nil {
                 self.dismiss(animated: true, completion: {
                     self.delegate?.userDidScanWith(barcode: "-1")

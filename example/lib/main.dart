@@ -33,6 +33,7 @@ class _MyAppState extends State<MyApp> {
           fontSize: 20,
           flashOffIconPath: "assets/flashoff.png",
           flashIconPath: "assets/flash.png",
+          duration: Duration(seconds: 5),
           changeCameraIconPath: "assets/camera.png");
       print(barcodeScanRes);
     } on PlatformException {
