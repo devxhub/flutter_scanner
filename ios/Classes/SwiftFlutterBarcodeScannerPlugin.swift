@@ -232,12 +232,7 @@ class BarcodeScannerViewController: UIViewController {
     var timer: Timer?
     var secondsRemaining = 10
 
-    override public func viewDidLoad() {
-        super.viewDidLoad()
-        // ... other code ...
-
-        startTimer()
-    }
+    
 
     func startTimer() {
         timer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { [weak self] timer in
@@ -364,6 +359,7 @@ class BarcodeScannerViewController: UIViewController {
         super.viewDidLoad()
         self.isOrientationPortrait = isLandscape
         self.initUIComponents()
+        startTimer()
     }
     
     override public func viewWillAppear(_ animated: Bool) {
