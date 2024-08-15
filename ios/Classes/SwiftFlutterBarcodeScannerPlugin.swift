@@ -18,6 +18,7 @@ public class SwiftFlutterBarcodeScannerPlugin: NSObject, FlutterPlugin, ScanBarc
     public static var lineColor:String=""
     public static var iconSize:String=""
     public static var fontSize:String=""
+    public static var duration:String=""
     public static var changeCameraIconPath:String=""
     public static var flashIconPath:String=""
     public static var flashOffIconPath:String=""
@@ -86,6 +87,9 @@ public class SwiftFlutterBarcodeScannerPlugin: NSObject, FlutterPlugin, ScanBarc
         }
         if let fontSize = args["fontSize"] as? String{
             SwiftFlutterBarcodeScannerPlugin.fontSize = fontSize
+        }
+        if let duration = args["duration"] as? String{
+            SwiftFlutterBarcodeScannerPlugin.duration = duration
         }
         if let flashIconPath = args["flashIconPath"] as? String{
             SwiftFlutterBarcodeScannerPlugin.flashIconPath = flashIconPath
@@ -237,8 +241,7 @@ class BarcodeScannerViewController: UIViewController {
     func startTimer() {
         timer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { [weak self] timer in
             guard let self = self else { return }
-            self.secondsRemaining   
- -= 1
+            self.secondsRemaining   -= 1
 
             if self.secondsRemaining == 0 {
                 timer.invalidate()
@@ -248,10 +251,10 @@ class BarcodeScannerViewController: UIViewController {
     }
 
     func handleTimeout() {
-        // Handle timeout behavior, e.g., dismiss the scanner view, send a timeout event to Flutter plugin
-        dismiss(animated: true) {
-            SwiftFlutterBarcodeScannerPlugin.onBarcodeScanReceiver(barcode: "-1") // Or send a timeout event
-        }
+        
+        self.dismiss(animated: true, completion: {
+                    self.delegate?.userDidScanWith(barcode: "-2")
+                })
     }
     
     private lazy var xCor: CGFloat! = {
@@ -359,7 +362,14 @@ class BarcodeScannerViewController: UIViewController {
         super.viewDidLoad()
         self.isOrientationPortrait = isLandscape
         self.initUIComponents()
-        startTimer()
+
+        let durationString = SwiftFlutterBarcodeScannerPlugin.duration
+        if durationString != "0", let duration = NumberFormatter().number(from: durationString){
+            let durationCGInt = Int(truncating: duration)
+            secondsRemaining = durationCGInt / 1000
+            startTimer()
+        }
+        
     }
     
     override public func viewWillAppear(_ animated: Bool) {
