@@ -226,6 +226,30 @@ class BarcodeScannerViewController: UIViewController {
     private var isOrientationPortrait = true
     var screenHeight:CGFloat = 0
 //    let captureMetadataOutput = AVCaptureMetadataOutput()
+
+var timer: Timer?
+    var secondsRemaining = 10
+
+    
+
+    func startTimer() {
+        timer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { [weak self] timer in
+            guard let self = self else { return }
+            self.secondsRemaining   -= 1
+
+            if self.secondsRemaining == 0 {
+                timer.invalidate()
+                self.handleTimeout()
+            }
+        }
+    }
+
+    func handleTimeout() {
+        
+        self.dismiss(animated: true, completion: {
+                    self.delegate?.userDidScanWith(barcode: "-2")
+                })
+    }
     
     private lazy var xCor: CGFloat! = {
         return self.isOrientationPortrait ? (screenSize.width - (screenSize.width*0.8))/2 :
@@ -332,6 +356,7 @@ class BarcodeScannerViewController: UIViewController {
         super.viewDidLoad()
         self.isOrientationPortrait = isLandscape
         self.initUIComponents()
+        startTimer()
     }
     
     override public func viewWillAppear(_ animated: Bool) {
