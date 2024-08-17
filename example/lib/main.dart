@@ -101,7 +101,7 @@ class _MyAppState extends State<MyApp> {
                       children: <Widget>[
                         ElevatedButton(
                             onPressed: () => scanBarcodeNormal(),
-                            child: Text('Start barcode scan')),
+                            child: Text('start scan with duration')),
                         ElevatedButton(
                             onPressed: () => scanQR(),
                             child: Text('Start QR scan')),

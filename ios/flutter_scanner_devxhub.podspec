@@ -3,7 +3,7 @@
 #
 Pod::Spec.new do |s|
   s.name             = 'flutter_scanner_devxhub'
-  s.version          = '1.0.1'
+  s.version          = '1.0.2'
   s.summary          = 'The Flutter Scanner plugin offers seamless barcode and QR code scanning capabilities for Flutter apps on Android and iOS. It supports a range of code types, enhancing mobile app functionality.'
   s.description      = <<-DESC
   The Flutter Scanner plugin offers seamless barcode and QR code scanning capabilities for Flutter apps on Android and iOS. It supports a range of code types, enhancing mobile app functionality.
