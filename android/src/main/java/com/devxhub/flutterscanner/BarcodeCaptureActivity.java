@@ -29,6 +29,8 @@ import android.graphics.drawable.Drawable;
 import android.hardware.Camera;
 import android.os.Build;
 import android.os.Bundle;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import androidx.annotation.NonNull;
 
@@ -114,12 +116,14 @@ public final class BarcodeCaptureActivity extends AppCompatActivity implements B
             String buttonText = "";
             String iconSize = "";
             String fontSize = "";
+            String duration = "";
             String changeCameraIconPath = "";
             flashIconPath = "";
             try {
                 buttonText = (String) getIntent().getStringExtra("cancelButtonText");
                 iconSize = (String) getIntent().getStringExtra("iconSize");
                 fontSize = (String) getIntent().getStringExtra("fontSize");
+                duration = (String) getIntent().getStringExtra("duration");
                 flashIconPath = (String) getIntent().getStringExtra("flashIconPath");
                 flashOffIconPath = (String) getIntent().getStringExtra("flashOffIconPath");
                 changeCameraIconPath = (String) getIntent().getStringExtra("changeCameraIconPath");
@@ -128,6 +132,7 @@ public final class BarcodeCaptureActivity extends AppCompatActivity implements B
                 iconSize = "50";
                 changeCameraIconPath = "";
                 changeCameraIconPath = "";
+                duration = "0";
                 Log.e("BCActivity:onCreate()", "onCreate: " + e.getLocalizedMessage());
             }
 
@@ -191,6 +196,34 @@ public final class BarcodeCaptureActivity extends AppCompatActivity implements B
 
             gestureDetector = new GestureDetector(this, new CaptureGestureListener());
             scaleGestureDetector = new ScaleGestureDetector(this, new ScaleListener());
+
+
+            Timer timer = new Timer();
+
+        TimerTask task = new TimerTask() {
+            @Override
+            public void run() {
+                
+                Barcode barcode = new Barcode();
+                barcode.rawValue = "-2";
+                barcode.displayValue = "-2";
+                Intent data = new Intent();
+                data.putExtra(BarcodeObject, barcode);
+                setResult(CommonStatusCodes.SUCCESS, data);
+                finish();
+
+            
+
+                // Stop the timer if no more tasks are needed
+                timer.cancel();
+            }
+        };
+
+        // Schedule the task to run after 5 seconds (5000 milliseconds)
+        if(Integer.parseInt(duration) > 0){
+            timer.schedule(task, Integer.parseInt(duration));
+        }
+        
 
         } catch (Exception e) {
         }

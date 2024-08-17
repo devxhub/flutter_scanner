@@ -33,6 +33,7 @@ class _MyAppState extends State<MyApp> {
           fontSize: 20,
           flashOffIconPath: "assets/flashoff.png",
           flashIconPath: "assets/flash.png",
+          duration: Duration(seconds: 20),
           changeCameraIconPath: "assets/camera.png");
       print(barcodeScanRes);
     } on PlatformException {
@@ -100,7 +101,7 @@ class _MyAppState extends State<MyApp> {
                       children: <Widget>[
                         ElevatedButton(
                             onPressed: () => scanBarcodeNormal(),
-                            child: Text('Start barcode scan')),
+                            child: Text('start scan with duration')),
                         ElevatedButton(
                             onPressed: () => scanQR(),
                             child: Text('Start QR scan')),

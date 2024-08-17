@@ -1,6 +1,6 @@
 PODS:
   - Flutter (1.0.0)
-  - flutter_scanner_devxhub (1.0.0):
+  - flutter_scanner_devxhub (1.0.1):
     - Flutter
 
 DEPENDENCIES:
@@ -15,8 +15,8 @@ EXTERNAL SOURCES:
 
 SPEC CHECKSUMS:
   Flutter: f04841e97a9d0b0a8025694d0796dd46242b2854
-  flutter_scanner_devxhub: 5e0472bb076e36410bd4dbf7a9136137036de1a1
+  flutter_scanner_devxhub: 435d9de8ffc65860b41f985cdb1c87da38369647
 
-PODFILE CHECKSUM: 70d9d25280d0dd177a5f637cdb0f0b0b12c6a189
+PODFILE CHECKSUM: 819463e6a0290f5a72f145ba7cde16e8b6ef0796
 
-COCOAPODS: 1.14.3
+COCOAPODS: 1.15.2
