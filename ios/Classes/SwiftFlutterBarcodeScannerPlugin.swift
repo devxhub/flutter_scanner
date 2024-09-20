@@ -367,6 +367,7 @@ class BarcodeScannerViewController: UIViewController {
         if durationString != "0", let duration = NumberFormatter().number(from: durationString){
             let durationCGInt = Int(truncating: duration)
             secondsRemaining = durationCGInt / 1000
+            captureSession.sessionPreset = .high
             startTimer()
         }
         
@@ -422,6 +423,12 @@ class BarcodeScannerViewController: UIViewController {
         guard let captureDevice = deviceDiscoverySession.devices.first else {
             print("Failed to get the camera device")
             return
+        }
+
+        if captureDevice.isFocusModeSupported(.continuousAutoFocus) {
+            try? captureDevice.lockForConfiguration()
+            captureDevice.focusMode = .continuousAutoFocus
+            captureDevice.unlockForConfiguration()
         }
         
         do {
