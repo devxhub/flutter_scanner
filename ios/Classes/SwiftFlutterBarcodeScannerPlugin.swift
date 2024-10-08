@@ -432,6 +432,8 @@ class BarcodeScannerViewController: UIViewController {
             if captureSession.inputs.isEmpty {
                 captureSession.addInput(input)
             }
+            // Enable Macro Mode and configure focus and exposure
+            enableMacroModeAndFocus(on: captureDevice)
             // Initialize a AVCaptureMetadataOutput object and set it as the output device to the capture session.
             
             let captureRectWidth = self.isOrientationPortrait ? (screenSize.width*0.8):(screenSize.height*0.8)
@@ -461,6 +463,39 @@ class BarcodeScannerViewController: UIViewController {
         self.drawUIOverlays{
         }
     }
+
+    func enableMacroModeAndFocus(on device: AVCaptureDevice) {
+    do {
+        try device.lockForConfiguration()
+
+        // Enable Macro Mode (iOS 15.0 and later)
+        if #available(iOS 15.0, *), device.isMacroModeSupported {
+            device.isMacroModeEnabled = true
+        }
+
+        // Set focus to the closest distance (macro focus)
+        device.setFocusModeLocked(lensPosition: 1.0) { _ in
+            // Focus locked for close-up
+        }
+
+        // Set the focus point to the center of the frame
+        if device.isFocusPointOfInterestSupported {
+            device.focusPointOfInterest = CGPoint(x: 0.5, y: 0.5)
+            device.focusMode = .continuousAutoFocus
+        }
+
+        // Set exposure to the center
+        if device.isExposurePointOfInterestSupported {
+            device.exposurePointOfInterest = CGPoint(x: 0.5, y: 0.5)
+            device.exposureMode = .continuousAutoExposure
+        }
+        
+        device.unlockForConfiguration()
+    } catch {
+        print("Error configuring macro mode, focus, and exposure: \(error)")
+    }
+}
+
     
     
     func drawUIOverlays(withCompletion processCompletionCallback: () -> Void){
