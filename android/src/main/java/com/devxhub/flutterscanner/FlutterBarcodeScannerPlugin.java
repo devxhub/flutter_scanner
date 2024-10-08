@@ -42,7 +42,6 @@ public class FlutterBarcodeScannerPlugin implements MethodCallHandler, ActivityR
     private static FlutterFragmentActivity activity;
     private static Result pendingResult;
     private Map<String, Object> arguments;
-
     private static final String TAG = FlutterBarcodeScannerPlugin.class.getSimpleName();
     private static final int RC_BARCODE_CAPTURE = 9001;
     public static String lineColor = "";
@@ -50,6 +49,8 @@ public class FlutterBarcodeScannerPlugin implements MethodCallHandler, ActivityR
     public static String flashOffIconPath = "";
     public static String changeCameraIconPath = "";
     public static boolean isShowFlashIcon = false;
+    public static boolean isShowMacroIcon = false;
+    public static String changeMacroIconPath = "";
     public static boolean isContinuousScan = false;
     public static String iconSize = "";
     public static String fontSize = "";
@@ -110,7 +111,9 @@ public class FlutterBarcodeScannerPlugin implements MethodCallHandler, ActivityR
                 flashIconPath = (String) arguments.get("flashIconPath");
                 flashOffIconPath = (String) arguments.get("flashOffIconPath");
                 changeCameraIconPath = (String) arguments.get("changeCameraIconPath");
+                changeMacroIconPath = (String) arguments.get("changeMacroIconPath");
                 isShowFlashIcon = (boolean) arguments.get("isShowFlashIcon");
+                isShowMacroIcon = (boolean) arguments.get("isShowMacroIcon");
                 iconSize = (String) arguments.get("iconSize");
                 fontSize = (String) arguments.get("fontSize");
                 duration = (String) arguments.get("duration");
@@ -129,7 +132,7 @@ public class FlutterBarcodeScannerPlugin implements MethodCallHandler, ActivityR
 
                 isContinuousScan = (boolean) arguments.get("isContinuousScan");
 
-                startBarcodeScannerActivityView((String) arguments.get("cancelButtonText"), isContinuousScan, iconSize, changeCameraIconPath, flashIconPath, flashOffIconPath, fontSize, duration);
+                startBarcodeScannerActivityView((String) arguments.get("cancelButtonText"), isContinuousScan, iconSize, changeCameraIconPath, changeMacroIconPath, flashIconPath, flashOffIconPath, fontSize, duration);
             }
 
 
@@ -138,9 +141,9 @@ public class FlutterBarcodeScannerPlugin implements MethodCallHandler, ActivityR
         }
     }
 
-    private void startBarcodeScannerActivityView(String buttonText, boolean isContinuousScan, String iconSize, String changeCameraIconPath, String flashIconPath, String flashOffIconPath, String fontSize, String duration ) {
+    private void startBarcodeScannerActivityView(String buttonText, boolean isContinuousScan, String iconSize, String changeCameraIconPath, String changeMacroIconPath, String flashIconPath, String flashOffIconPath, String fontSize, String duration ) {
         try {
-            Intent intent = new Intent(activity, BarcodeCaptureActivity.class).putExtra("cancelButtonText", buttonText).putExtra("iconSize", iconSize).putExtra("flashIconPath", flashIconPath).putExtra("changeCameraIconPath", changeCameraIconPath).putExtra("flashOffIconPath", flashOffIconPath).putExtra("fontSize", fontSize).putExtra("duration", duration);
+            Intent intent = new Intent(activity, BarcodeCaptureActivity.class).putExtra("cancelButtonText", buttonText).putExtra("iconSize", iconSize).putExtra("flashIconPath", flashIconPath).putExtra("changeCameraIconPath", changeCameraIconPath).putExtra("changeMacroIconPath", changeMacroIconPath).putExtra("flashOffIconPath", flashOffIconPath).putExtra("fontSize", fontSize).putExtra("duration", duration);
             
             if (isContinuousScan) {
                 activity.startActivity(intent);

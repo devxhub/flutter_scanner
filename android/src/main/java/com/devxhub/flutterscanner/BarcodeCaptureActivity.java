@@ -29,16 +29,6 @@ import android.graphics.drawable.Drawable;
 import android.hardware.Camera;
 import android.os.Build;
 import android.os.Bundle;
-import java.util.Timer;
-import java.util.TimerTask;
-
-import androidx.annotation.NonNull;
-
-import com.google.android.material.snackbar.Snackbar;
-
-import androidx.core.app.ActivityCompat;
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
@@ -47,6 +37,10 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 
 import com.devxhub.flutterscanner.camera.CameraSource;
 import com.devxhub.flutterscanner.camera.CameraSourcePreview;
@@ -57,9 +51,13 @@ import com.google.android.gms.common.api.CommonStatusCodes;
 import com.google.android.gms.vision.MultiProcessor;
 import com.google.android.gms.vision.barcode.Barcode;
 import com.google.android.gms.vision.barcode.BarcodeDetector;
+import com.google.android.material.snackbar.Snackbar;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 /**
  * Activity for the multi-tracker app. This app detects barcodes and displays
@@ -88,7 +86,7 @@ public final class BarcodeCaptureActivity extends AppCompatActivity implements B
     private GestureDetector gestureDetector;
 
     private ImageView imgViewBarcodeCaptureUseFlash;
-    private ImageView imgViewSwitchCamera;
+    private ImageView imgViewSwitchCamera, imageViewMacro;
     String flashIconPath = "";
     String flashOffIconPath = "";
 
@@ -118,6 +116,7 @@ public final class BarcodeCaptureActivity extends AppCompatActivity implements B
             String fontSize = "";
             String duration = "";
             String changeCameraIconPath = "";
+            String changeMacroIconPath = "";
             flashIconPath = "";
             try {
                 buttonText = (String) getIntent().getStringExtra("cancelButtonText");
@@ -127,11 +126,12 @@ public final class BarcodeCaptureActivity extends AppCompatActivity implements B
                 flashIconPath = (String) getIntent().getStringExtra("flashIconPath");
                 flashOffIconPath = (String) getIntent().getStringExtra("flashOffIconPath");
                 changeCameraIconPath = (String) getIntent().getStringExtra("changeCameraIconPath");
+                changeMacroIconPath = (String) getIntent().getStringExtra("changeMacroIconPath");
             } catch (Exception e) {
                 buttonText = "Cancel";
                 iconSize = "50";
                 changeCameraIconPath = "";
-                changeCameraIconPath = "";
+                changeMacroIconPath = "";
                 duration = "0";
                 Log.e("BCActivity:onCreate()", "onCreate: " + e.getLocalizedMessage());
             }
@@ -167,7 +167,18 @@ public final class BarcodeCaptureActivity extends AppCompatActivity implements B
  if(Integer.valueOf(iconSize) > 0){
             imgViewSwitchCamera.getLayoutParams().width = Integer.valueOf(iconSize);
             imgViewSwitchCamera.getLayoutParams().height = Integer.valueOf(iconSize);
+
+
  }
+
+            imageViewMacro = findViewById(R.id.imageViewMacro);
+            imageViewMacro.setOnClickListener(this);
+            imageViewMacro.setVisibility(FlutterBarcodeScannerPlugin.isShowMacroIcon ? View.VISIBLE : View.GONE);
+            if(Integer.valueOf(iconSize) > 0) {
+                imageViewMacro.getLayoutParams().width = Integer.valueOf(iconSize);
+                imageViewMacro.getLayoutParams().height = Integer.valueOf(iconSize);
+
+            }
 
             mPreview = findViewById(R.id.preview);
             mGraphicOverlay = findViewById(R.id.graphicOverlay);
@@ -176,6 +187,15 @@ public final class BarcodeCaptureActivity extends AppCompatActivity implements B
                     InputStream is = getAssets().open("flutter_assets/" + changeCameraIconPath);
                     Drawable d = Drawable.createFromStream(is, null);
                     imgViewSwitchCamera.setImageDrawable(d);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+            if (!changeMacroIconPath.equals("")) {
+                try {
+                    InputStream is = getAssets().open("flutter_assets/" + changeMacroIconPath);
+                    Drawable d = Drawable.createFromStream(is, null);
+                    imageViewMacro.setImageDrawable(d);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -515,7 +535,67 @@ public final class BarcodeCaptureActivity extends AppCompatActivity implements B
             boolean useFlash = flashStatus == USE_FLASH.ON.ordinal();
             createCameraSource(autoFocus, useFlash, getInverseCameraFacing(currentFacing));
             startCameraSource();
+        } else if (i == R.id.imageViewMacro) {
+            mCameraSource.doZoomToggle();
+//            int currentFacing = mCameraSource.getCameraFacing();
+//            boolean autoFocus = mCameraSource.getFocusMode() != null;
+//            boolean useFlash = flashStatus == USE_FLASH.ON.ordinal();
+//            createCameraSourceMacro(autoFocus, useFlash, currentFacing);
+//            startCameraSource();
         }
+    }
+
+    @SuppressLint("InlinedApi")
+    private void createCameraSourceMacro(boolean autoFocus, boolean useFlash, int cameraFacing) {
+        Context context = getApplicationContext();
+
+        // A barcode detector is created to track barcodes. An associated
+        // multi-processor instance
+        // is set to receive the barcode detection results, track the barcodes, and
+        // maintain
+        // graphics for each barcode on screen. The factory is used by the
+        // multi-processor to
+        // create a separate tracker instance for each barcode.
+        BarcodeDetector barcodeDetector = new BarcodeDetector.Builder(context).build();
+        BarcodeTrackerFactory barcodeFactory = new BarcodeTrackerFactory(mGraphicOverlay, this);
+        barcodeDetector.setProcessor(new MultiProcessor.Builder<>(barcodeFactory).build());
+
+        if (!barcodeDetector.isOperational()) {
+            // Check for low storage. If there is low storage, the native library will not
+            // be
+            // downloaded, so detection will not become operational.
+            IntentFilter lowstorageFilter = new IntentFilter(Intent.ACTION_DEVICE_STORAGE_LOW);
+            boolean hasLowStorage = registerReceiver(null, lowstorageFilter) != null;
+
+            if (hasLowStorage) {
+                Toast.makeText(this, R.string.low_storage_error, Toast.LENGTH_LONG).show();
+            }
+        }
+
+        // Creates and starts the camera. Note that this uses a higher resolution in
+        // comparison
+        // to other detection examples to enable the barcode detector to detect small
+        // barcodes
+        // at long distances.
+        CameraSource.Builder builder = new CameraSource.Builder(getApplicationContext(), barcodeDetector).setFacing(cameraFacing).setRequestedPreviewSize(1600, 1024).setRequestedFps(30.0f).setFlashMode(useFlash ? Camera.Parameters.FLASH_MODE_TORCH : null);
+        builder = builder.setFocusMode( Camera.Parameters.FOCUS_MODE_MACRO );
+        // make sure that auto focus is an available option
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
+////            builder = builder.setFocusMode(autoFocus ? Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE : null);
+//            if(mCameraSource.isMacroModeAvailable()){
+//                builder = builder.setFocusMode( Camera.Parameters.FOCUS_MODE_MACRO );
+//            }else{
+//                builder = builder.setFocusMode(Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE);
+//            }
+//        }
+
+
+        // Stop & release current camera source before creating a new one.
+        if (mCameraSource != null) {
+            mCameraSource.stop();
+            mCameraSource.release();
+        }
+        mCameraSource = builder.build();
     }
 
     private int getInverseCameraFacing(int cameraFacing) {

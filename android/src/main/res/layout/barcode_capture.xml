@@ -21,42 +21,49 @@
 
     </com.devxhub.flutterscanner.camera.CameraSourcePreview>
 
-    <RelativeLayout
+    <LinearLayout
         android:id="@+id/layoutBottom"
         android:layout_width="match_parent"
         android:layout_height="60dp"
         android:layout_alignParentBottom="true"
-        android:background="@android:color/black">
+        android:background="@android:color/black"
+        android:orientation="horizontal"
+        android:gravity="center">
 
         <ImageView
             android:id="@+id/imgViewSwitchCamera"
             android:layout_width="48dp"
             android:layout_height="48dp"
-            android:layout_alignParentLeft="true"
-            android:layout_centerVertical="true"
-            android:layout_marginLeft="10dp"
+            android:layout_weight="1"
             android:contentDescription="Switch camera"
-            android:src="@drawable/ic_switch_camera"
-            android:layout_alignParentStart="true" />
+            android:src="@drawable/ic_switch_camera" />
 
         <ImageView
             android:id="@+id/imgViewBarcodeCaptureUseFlash"
             android:layout_width="48dp"
             android:layout_height="48dp"
-            android:layout_centerInParent="true"
+            android:layout_weight="1"
             android:contentDescription="Flash button"
             android:src="@drawable/ic_barcode_flash_off" />
+
+        <!-- New ImageView -->
+        <ImageView
+            android:id="@+id/imageViewMacro"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_weight="1"
+            android:contentDescription="Macro button"
+            android:src="@drawable/macro_image" />
 
         <Button
             android:id="@+id/btnBarcodeCaptureCancel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
-            android:layout_centerVertical="true"
-            android:layout_marginRight="10dp"
+            android:layout_weight="1"
             android:background="@android:color/transparent"
             android:text="Cancel"
             android:textAllCaps="false"
             android:textColor="@android:color/white" />
-    </RelativeLayout>
+    </LinearLayout>
+
 </RelativeLayout>
