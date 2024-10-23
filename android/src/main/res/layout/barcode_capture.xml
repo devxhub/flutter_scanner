@@ -39,6 +39,14 @@
             android:src="@drawable/ic_switch_camera" />
 
         <ImageView
+            android:id="@+id/imageViewInput"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_weight="1"
+            android:contentDescription="input button"
+            android:src="@drawable/keypad" />
+
+        <ImageView
             android:id="@+id/imgViewBarcodeCaptureUseFlash"
             android:layout_width="48dp"
             android:layout_height="48dp"
@@ -47,13 +55,7 @@
             android:src="@drawable/ic_barcode_flash_off" />
 
         <!-- New ImageView -->
-        <ImageView
-            android:id="@+id/imageViewMacro"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:layout_weight="1"
-            android:contentDescription="Macro button"
-            android:src="@drawable/macro_image" />
+        
 
         <Button
             android:id="@+id/btnBarcodeCaptureCancel"
