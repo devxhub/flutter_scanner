@@ -138,6 +138,11 @@ public class SwiftFlutterBarcodeScannerPlugin: NSObject, FlutterPlugin, ScanBarc
         }else {
             SwiftFlutterBarcodeScannerPlugin.isShowFlashIcon = false
         }
+        if let inputIconStatus = args["isShowInputIcon"] as? Bool{
+            SwiftFlutterBarcodeScannerPlugin.isShowInputIcon = inputIconStatus
+        }else {
+            SwiftFlutterBarcodeScannerPlugin.isShowInputIcon = false
+        }
         if let isContinuousScan = args["isContinuousScan"] as? Bool{
             SwiftFlutterBarcodeScannerPlugin.isContinuousScan = isContinuousScan
         }else {
@@ -387,7 +392,7 @@ class BarcodeScannerViewController: UIViewController {
                 button.setImage(resizedImage, for: .normal)
             }
         }
-        
+        button.addTarget(self, action: #selector(BarcodeScannerViewController.inputButtonClicked), for: .touchUpInside)
         return button
     }()
     
@@ -556,6 +561,9 @@ class BarcodeScannerViewController: UIViewController {
             self.view.bringSubviewToFront(flashIcon)
             if(!SwiftFlutterBarcodeScannerPlugin.isShowFlashIcon){
                 flashIcon.isHidden=true
+            }
+            if(!SwiftFlutterBarcodeScannerPlugin.isShowInputIcon){
+                InputButton.isHidden=true
             }
             qrCodeFrameView.layoutIfNeeded()
             qrCodeFrameView.layoutSubviews()
@@ -779,6 +787,21 @@ class BarcodeScannerViewController: UIViewController {
             if self.delegate != nil {
                 self.dismiss(animated: true, completion: {
                     self.delegate?.userDidScanWith(barcode: "-1")
+                })
+            }
+        }
+    }
+    /// Cancel button click event listener
+    @IBAction private func inputButtonClicked() {
+        if SwiftFlutterBarcodeScannerPlugin.isContinuousScan{
+            self.dismiss(animated: true, completion: {
+                SwiftFlutterBarcodeScannerPlugin.onBarcodeScanReceiver(barcode: "-3")
+            })
+        }else{
+            // Todo
+            if self.delegate != nil {
+                self.dismiss(animated: true, completion: {
+                    self.delegate?.userDidScanWith(barcode: "-3")
                 })
             }
         }
