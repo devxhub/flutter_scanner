@@ -80,7 +80,7 @@ class _MyAppState extends State<MyApp> {
           cancelButtonText: 'Cancel',
           isShowFlashIcon: true,
           isOrientationLandscape: true,
-          isShowInputIcon: false,
+          isShowInputIcon: true,
           scanMode: ScanMode.BARCODE,
           iconSize: 50,
           fontSize: 20,

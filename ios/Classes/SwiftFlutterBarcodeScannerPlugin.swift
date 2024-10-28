@@ -68,6 +68,8 @@ public class SwiftFlutterBarcodeScannerPlugin: NSObject, FlutterPlugin, ScanBarc
         return nil
     }
     
+
+    
     public static func onBarcodeScanReceiver( barcode:String){
         barcodeStream!(barcode)
     }
@@ -148,6 +150,11 @@ public class SwiftFlutterBarcodeScannerPlugin: NSObject, FlutterPlugin, ScanBarc
         }else {
             SwiftFlutterBarcodeScannerPlugin.isContinuousScan = false
         }
+        if let isOrientationLandscape = args["isOrientationLandscape"] as? Bool{
+            SwiftFlutterBarcodeScannerPlugin.isOrientationLandscape = isOrientationLandscape
+        }else {
+            SwiftFlutterBarcodeScannerPlugin.isOrientationLandscape = false
+        }
         
         if let scanModeReceived = args["scanMode"] as? Int {
             if scanModeReceived == ScanMode.DEFAULT.index {
@@ -168,6 +175,13 @@ public class SwiftFlutterBarcodeScannerPlugin: NSObject, FlutterPlugin, ScanBarc
         if #available(iOS 13.0, *) {
             controller.modalPresentationStyle = .fullScreen
         }
+
+        if SwiftFlutterBarcodeScannerPlugin.isOrientationLandscape == true {
+            controller.setOrientation(to: .landscapeRight)
+        }
+
+        
+
 
         SwiftFlutterBarcodeScannerPlugin.viewController.present(controller
                                                                                    , animated: true) {
@@ -211,6 +225,7 @@ public class SwiftFlutterBarcodeScannerPlugin: NSObject, FlutterPlugin, ScanBarc
     }
     
     public func userDidScanWith(barcode: String){
+        
         pendingResult(barcode)
     }
     
@@ -272,13 +287,25 @@ class BarcodeScannerViewController: UIViewController {
             }
         }
     }
-
+// let controller = BarcodeScannerViewController()
+//         controller.setOrientation(to: .portrait)
     func handleTimeout() {
-        
+        setOrientation(to: .portrait)
         self.dismiss(animated: true, completion: {
                     self.delegate?.userDidScanWith(barcode: "-2")
                 })
     }
+
+    // override var supportedInterfaceOrientations: UIInterfaceOrientationMask {
+    // return .landscape // or .portrait, .all, etc., depending on your needs
+    // }
+
+    func setOrientation(to orientation: UIInterfaceOrientation) {
+    UIDevice.current.setValue(orientation.rawValue, forKey: "orientation")
+    UIViewController.attemptRotationToDeviceOrientation()
+    }
+
+
     
     private lazy var xCor: CGFloat! = {
         return self.isOrientationPortrait ? (screenSize.width - (screenSize.width*0.8))/2 :
@@ -779,12 +806,14 @@ class BarcodeScannerViewController: UIViewController {
     /// Cancel button click event listener
     @IBAction private func cancelButtonClicked() {
         if SwiftFlutterBarcodeScannerPlugin.isContinuousScan{
+            setOrientation(to: .portrait)
             self.dismiss(animated: true, completion: {
                 SwiftFlutterBarcodeScannerPlugin.onBarcodeScanReceiver(barcode: "-1")
             })
         }else{
             // Todo
             if self.delegate != nil {
+                setOrientation(to: .portrait)
                 self.dismiss(animated: true, completion: {
                     self.delegate?.userDidScanWith(barcode: "-1")
                 })
@@ -794,12 +823,14 @@ class BarcodeScannerViewController: UIViewController {
     /// Cancel button click event listener
     @IBAction private func inputButtonClicked() {
         if SwiftFlutterBarcodeScannerPlugin.isContinuousScan{
+            setOrientation(to: .portrait)
             self.dismiss(animated: true, completion: {
                 SwiftFlutterBarcodeScannerPlugin.onBarcodeScanReceiver(barcode: "-3")
             })
         }else{
             // Todo
             if self.delegate != nil {
+                setOrientation(to: .portrait)
                 self.dismiss(animated: true, completion: {
                     self.delegate?.userDidScanWith(barcode: "-3")
                 })
@@ -901,6 +932,7 @@ class BarcodeScannerViewController: UIViewController {
             return
         }
         if self.delegate != nil {
+            setOrientation(to: .portrait)
             self.dismiss(animated: true, completion: {
                 self.delegate?.userDidScanWith(barcode: decodedURL)
             })
