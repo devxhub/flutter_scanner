@@ -191,8 +191,15 @@ public class SwiftFlutterBarcodeScannerPlugin: NSObject, FlutterPlugin, ScanBarc
        if checkCameraAvailability(){
            if checkForCameraPermission() {
             if SwiftFlutterBarcodeScannerPlugin.isOrientationLandscape == true {
-            controller.setOrientation(to: .landscapeRight)
+            if #available(iOS 16.0, *) {
+            let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene
+            windowScene?.requestGeometryUpdate(.iOS(interfaceOrientations: .landscape))
+            controller.updateUIAfterRotation();
+            }else{
+                controller.setOrientation(to: .landscapeRight)
+                controller.updateUIAfterRotation();
             }
+        }
                SwiftFlutterBarcodeScannerPlugin.viewController.present(controller
                                                                            , animated: true) {
                        
@@ -293,7 +300,17 @@ class BarcodeScannerViewController: UIViewController {
 // let controller = BarcodeScannerViewController()
 //         controller.setOrientation(to: .portrait)
     func handleTimeout() {
-        setOrientation(to: .portrait)
+        if SwiftFlutterBarcodeScannerPlugin.isOrientationLandscape == true {
+            if #available(iOS 16.0, *) {
+            let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene
+            windowScene?.requestGeometryUpdate(.iOS(interfaceOrientations: .landscape))
+            updateUIAfterRotation();
+            }else{
+                setOrientation(to: .portrait)
+                updateUIAfterRotation();
+            }
+        }
+        // setOrientation(to: .portrait)
         self.dismiss(animated: true, completion: {
                     self.delegate?.userDidScanWith(barcode: "-2")
                 })
@@ -809,14 +826,34 @@ class BarcodeScannerViewController: UIViewController {
     /// Cancel button click event listener
     @IBAction private func cancelButtonClicked() {
         if SwiftFlutterBarcodeScannerPlugin.isContinuousScan{
-            setOrientation(to: .portrait)
+            if SwiftFlutterBarcodeScannerPlugin.isOrientationLandscape == true {
+            if #available(iOS 16.0, *) {
+            let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene
+            windowScene?.requestGeometryUpdate(.iOS(interfaceOrientations: .landscape))
+            updateUIAfterRotation();
+            }else{
+                setOrientation(to: .portrait)
+                updateUIAfterRotation();
+            }
+        }
+        // setOrientation(to: .portrait)
             self.dismiss(animated: true, completion: {
                 SwiftFlutterBarcodeScannerPlugin.onBarcodeScanReceiver(barcode: "-1")
             })
         }else{
             // Todo
             if self.delegate != nil {
+                if SwiftFlutterBarcodeScannerPlugin.isOrientationLandscape == true {
+            if #available(iOS 16.0, *) {
+            let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene
+            windowScene?.requestGeometryUpdate(.iOS(interfaceOrientations: .landscape))
+            updateUIAfterRotation();
+            }else{
                 setOrientation(to: .portrait)
+                updateUIAfterRotation();
+            }
+        }
+        // setOrientation(to: .portrait)
                 self.dismiss(animated: true, completion: {
                     self.delegate?.userDidScanWith(barcode: "-1")
                 })
@@ -826,14 +863,34 @@ class BarcodeScannerViewController: UIViewController {
     /// Cancel button click event listener
     @IBAction private func inputButtonClicked() {
         if SwiftFlutterBarcodeScannerPlugin.isContinuousScan{
-            setOrientation(to: .portrait)
+            if SwiftFlutterBarcodeScannerPlugin.isOrientationLandscape == true {
+            if #available(iOS 16.0, *) {
+            let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene
+            windowScene?.requestGeometryUpdate(.iOS(interfaceOrientations: .landscape))
+            updateUIAfterRotation();
+            }else{
+                setOrientation(to: .portrait)
+                updateUIAfterRotation();
+            }
+        }
+        // setOrientation(to: .portrait)
             self.dismiss(animated: true, completion: {
                 SwiftFlutterBarcodeScannerPlugin.onBarcodeScanReceiver(barcode: "-3")
             })
         }else{
             // Todo
             if self.delegate != nil {
+                if SwiftFlutterBarcodeScannerPlugin.isOrientationLandscape == true {
+            if #available(iOS 16.0, *) {
+            let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene
+            windowScene?.requestGeometryUpdate(.iOS(interfaceOrientations: .landscape))
+            updateUIAfterRotation();
+            }else{
                 setOrientation(to: .portrait)
+                updateUIAfterRotation();
+            }
+        }
+        // setOrientation(to: .portrait)
                 self.dismiss(animated: true, completion: {
                     self.delegate?.userDidScanWith(barcode: "-3")
                 })
@@ -935,7 +992,17 @@ class BarcodeScannerViewController: UIViewController {
             return
         }
         if self.delegate != nil {
-            setOrientation(to: .portrait)
+            if SwiftFlutterBarcodeScannerPlugin.isOrientationLandscape == true {
+            if #available(iOS 16.0, *) {
+            let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene
+            windowScene?.requestGeometryUpdate(.iOS(interfaceOrientations: .landscape))
+            updateUIAfterRotation();
+            }else{
+                setOrientation(to: .portrait)
+                updateUIAfterRotation();
+            }
+        }
+        // setOrientation(to: .portrait)
             self.dismiss(animated: true, completion: {
                 self.delegate?.userDidScanWith(barcode: decodedURL)
             })
