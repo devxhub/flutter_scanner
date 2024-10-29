@@ -194,10 +194,10 @@ public class SwiftFlutterBarcodeScannerPlugin: NSObject, FlutterPlugin, ScanBarc
             if #available(iOS 16.0, *) {
             let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene
             windowScene?.requestGeometryUpdate(.iOS(interfaceOrientations: .landscape))
-            controller.updateUIAfterRotation();
+            // controller.updateUIAfterRotation();
             }else{
                 controller.setOrientation(to: .landscapeRight)
-                controller.updateUIAfterRotation();
+                // controller.updateUIAfterRotation();
             }
         }
                SwiftFlutterBarcodeScannerPlugin.viewController.present(controller
@@ -303,7 +303,7 @@ class BarcodeScannerViewController: UIViewController {
         if SwiftFlutterBarcodeScannerPlugin.isOrientationLandscape == true {
             if #available(iOS 16.0, *) {
             let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene
-            windowScene?.requestGeometryUpdate(.iOS(interfaceOrientations: .landscape))
+            windowScene?.requestGeometryUpdate(.iOS(interfaceOrientations: .portrait))
             updateUIAfterRotation();
             }else{
                 setOrientation(to: .portrait)
@@ -829,7 +829,7 @@ class BarcodeScannerViewController: UIViewController {
             if SwiftFlutterBarcodeScannerPlugin.isOrientationLandscape == true {
             if #available(iOS 16.0, *) {
             let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene
-            windowScene?.requestGeometryUpdate(.iOS(interfaceOrientations: .landscape))
+            windowScene?.requestGeometryUpdate(.iOS(interfaceOrientations: .portrait))
             updateUIAfterRotation();
             }else{
                 setOrientation(to: .portrait)
@@ -843,10 +843,10 @@ class BarcodeScannerViewController: UIViewController {
         }else{
             // Todo
             if self.delegate != nil {
-                if SwiftFlutterBarcodeScannerPlugin.isOrientationLandscape == true {
+            if SwiftFlutterBarcodeScannerPlugin.isOrientationLandscape == true {
             if #available(iOS 16.0, *) {
             let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene
-            windowScene?.requestGeometryUpdate(.iOS(interfaceOrientations: .landscape))
+            windowScene?.requestGeometryUpdate(.iOS(interfaceOrientations: .portrait))
             updateUIAfterRotation();
             }else{
                 setOrientation(to: .portrait)
@@ -866,7 +866,7 @@ class BarcodeScannerViewController: UIViewController {
             if SwiftFlutterBarcodeScannerPlugin.isOrientationLandscape == true {
             if #available(iOS 16.0, *) {
             let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene
-            windowScene?.requestGeometryUpdate(.iOS(interfaceOrientations: .landscape))
+            windowScene?.requestGeometryUpdate(.iOS(interfaceOrientations: .portrait))
             updateUIAfterRotation();
             }else{
                 setOrientation(to: .portrait)
@@ -883,7 +883,7 @@ class BarcodeScannerViewController: UIViewController {
                 if SwiftFlutterBarcodeScannerPlugin.isOrientationLandscape == true {
             if #available(iOS 16.0, *) {
             let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene
-            windowScene?.requestGeometryUpdate(.iOS(interfaceOrientations: .landscape))
+            windowScene?.requestGeometryUpdate(.iOS(interfaceOrientations: .portrait))
             updateUIAfterRotation();
             }else{
                 setOrientation(to: .portrait)
@@ -980,7 +980,7 @@ class BarcodeScannerViewController: UIViewController {
    private func updatePreviewLayer(layer: AVCaptureConnection, orientation: AVCaptureVideoOrientation) {
        layer.videoOrientation = orientation
    }
-    
+
     var isLandscape: Bool {
         return UIDevice.current.orientation.isValidInterfaceOrientation
             ? UIDevice.current.orientation.isPortrait
@@ -995,7 +995,7 @@ class BarcodeScannerViewController: UIViewController {
             if SwiftFlutterBarcodeScannerPlugin.isOrientationLandscape == true {
             if #available(iOS 16.0, *) {
             let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene
-            windowScene?.requestGeometryUpdate(.iOS(interfaceOrientations: .landscape))
+            windowScene?.requestGeometryUpdate(.iOS(interfaceOrientations: .portrait))
             updateUIAfterRotation();
             }else{
                 setOrientation(to: .portrait)
