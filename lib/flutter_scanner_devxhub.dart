@@ -1,5 +1,5 @@
 import 'dart:async';
-
+import 'dart:io';
 import 'package:flutter/services.dart';
 
 /// Scan mode which is either QR code or BARCODE
@@ -57,9 +57,22 @@ class FlutterScanner {
 
     print(params);
 
+    if (isOrientationLandscape == true && Platform.isIOS) {
+      SystemChrome.setPreferredOrientations([
+        DeviceOrientation.landscapeRight,
+      ]);
+    }
+
     // / Get barcode scan result
     final barcodeResult =
         await _channel.invokeMethod('scanBarcode', params) ?? '';
+    if (isOrientationLandscape == true &&
+        Platform.isIOS &&
+        barcodeResult != null) {
+      SystemChrome.setPreferredOrientations([
+        DeviceOrientation.portraitUp,
+      ]);
+    }
     return barcodeResult;
   }
 
