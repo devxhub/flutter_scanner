@@ -1020,19 +1020,26 @@ class BarcodeScannerViewController: UIViewController {
         }
         if self.delegate != nil {
             if SwiftFlutterBarcodeScannerPlugin.isOrientationLandscape == true {
-                if #available(iOS 16.0, *) {
-                    let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene
-                    windowScene?.requestGeometryUpdate(.iOS(interfaceOrientations: .portrait))
-                    updateUIAfterRotation();
-                }else{
-                    setOrientation(to: .portrait)
-                    updateUIAfterRotation();
-                }
+                 if decodedURL.count >= 44 && decodedURL.count <= 48 {
+                    if #available(iOS 16.0, *) {
+                        let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene
+                        windowScene?.requestGeometryUpdate(.iOS(interfaceOrientations: .portrait))
+                        updateUIAfterRotation();
+                    }else{
+                        setOrientation(to: .portrait)
+                        updateUIAfterRotation();
+                    }
+                    self.dismiss(animated: true, completion: {
+                     self.delegate?.userDidScanWith(barcode: decodedURL)
+                    })
+                 }
+            }else{
+                self.dismiss(animated: true, completion: {
+                self.delegate?.userDidScanWith(barcode: decodedURL)
+                })
             }
             // setOrientation(to: .portrait)
-            self.dismiss(animated: true, completion: {
-                self.delegate?.userDidScanWith(barcode: decodedURL)
-            })
+            
         }
     }
 }
