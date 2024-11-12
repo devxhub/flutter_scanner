@@ -723,19 +723,35 @@ if(FlutterBarcodeScannerPlugin.isOrientationLandscape){
         }
     }
 
-    @Override
+     @Override
     public void onBarcodeDetected(Barcode barcode) {
         if (null != barcode) {
-            if(FlutterBarcodeScannerPlugin.isOrientationLandscape){
-                setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-            }
+            // Log.d("onBarcodeDetected()", "onBarcodeDetected: " + barcode);
+            // if(FlutterBarcodeScannerPlugin.isOrientationLandscape){
+                
+            // }
             if (FlutterBarcodeScannerPlugin.isContinuousScan) {
-                FlutterBarcodeScannerPlugin.onBarcodeScanReceiver(barcode);
+                // Log.e("onBarcodeDetected()", "onBarcodeDetected: " + barcode);
+                // FlutterBarcodeScannerPlugin.onBarcodeScanReceiver(barcode);
             } else {
-                Intent data = new Intent();
-                data.putExtra(BarcodeObject, barcode);
-                setResult(CommonStatusCodes.SUCCESS, data);
-                finish();
+                if(FlutterBarcodeScannerPlugin.isOrientationLandscape){
+                    
+                    if(barcode.rawValue.length() >= 44 && barcode.rawValue.length() <=48){
+                        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+                        Intent data = new Intent();
+                        data.putExtra(BarcodeObject, barcode);
+                        setResult(CommonStatusCodes.SUCCESS, data);
+                        finish();
+                    }
+                }else{
+                    Intent data = new Intent();
+                        data.putExtra(BarcodeObject, barcode);
+                        setResult(CommonStatusCodes.SUCCESS, data);
+                        finish();
+                }
+
+
+                
             }
         }
     }
