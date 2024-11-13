@@ -16,6 +16,8 @@ public class SwiftFlutterBarcodeScannerPlugin: NSObject, FlutterPlugin, ScanBarc
     var registrar: FlutterPluginRegistrar? = nil
     public static var viewController = UIViewController()
     public static var lineColor:String=""
+    public static var minimunLengthMinusOne:String=""
+    public static var maximunLengthPlusOne:String=""
     public static var iconSize:String=""
     public static var fontSize:String=""
     public static var duration:String=""
@@ -33,6 +35,8 @@ public class SwiftFlutterBarcodeScannerPlugin: NSObject, FlutterPlugin, ScanBarc
     var pendingResult:FlutterResult!
     public static var isContinuousScan:Bool=false
     public static var isOrientationLandscape:Bool=false
+    public static var isNeedLengthCondition:Bool=false
+    public static var isNeedOnlyDigitCondition:Bool=false
     static var barcodeStream:FlutterEventSink?=nil
     public static var scanMode = ScanMode.QR.index
     let flutterEngine = FlutterEngine(name: "my_flutter_engine")
@@ -91,6 +95,14 @@ public class SwiftFlutterBarcodeScannerPlugin: NSObject, FlutterPlugin, ScanBarc
         if let iconSize = args["iconSize"] as? String{
             SwiftFlutterBarcodeScannerPlugin.iconSize = iconSize
         }
+        
+        if let minimunLengthMinusOne = args["minimunLengthMinusOne"] as? String{
+            SwiftFlutterBarcodeScannerPlugin.minimunLengthMinusOne = minimunLengthMinusOne
+        }
+        if let maximunLengthPlusOne = args["maximunLengthPlusOne"] as? String{
+            SwiftFlutterBarcodeScannerPlugin.maximunLengthPlusOne = maximunLengthPlusOne
+        }
+
         if let fontSize = args["fontSize"] as? String{
             SwiftFlutterBarcodeScannerPlugin.fontSize = fontSize
         }
@@ -150,10 +162,25 @@ public class SwiftFlutterBarcodeScannerPlugin: NSObject, FlutterPlugin, ScanBarc
         }else {
             SwiftFlutterBarcodeScannerPlugin.isContinuousScan = false
         }
+        
         if let isOrientationLandscape = args["isOrientationLandscape"] as? Bool{
             SwiftFlutterBarcodeScannerPlugin.isOrientationLandscape = isOrientationLandscape
         }else {
             SwiftFlutterBarcodeScannerPlugin.isOrientationLandscape = false
+        }
+        
+
+        if let isNeedLengthCondition = args["isNeedLengthCondition"] as? Bool{
+            SwiftFlutterBarcodeScannerPlugin.isNeedLengthCondition = isNeedLengthCondition
+        }else {
+            SwiftFlutterBarcodeScannerPlugin.isNeedLengthCondition = false
+        }
+        
+
+        if let isNeedOnlyDigitCondition = args["isNeedOnlyDigitCondition"] as? Bool{
+            SwiftFlutterBarcodeScannerPlugin.isNeedOnlyDigitCondition = isNeedOnlyDigitCondition
+        }else {
+            SwiftFlutterBarcodeScannerPlugin.isNeedOnlyDigitCondition = false
         }
         
         if let scanModeReceived = args["scanMode"] as? Int {
@@ -1019,26 +1046,127 @@ class BarcodeScannerViewController: UIViewController {
             return
         }
         if self.delegate != nil {
-            if SwiftFlutterBarcodeScannerPlugin.isOrientationLandscape == true {
-                 if decodedURL.count >= 44 && decodedURL.count <= 48 {
-                    if #available(iOS 16.0, *) {
-                        let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene
-                        windowScene?.requestGeometryUpdate(.iOS(interfaceOrientations: .portrait))
-                        updateUIAfterRotation();
-                    }else{
-                        setOrientation(to: .portrait)
-                        updateUIAfterRotation();
-                    }
-                    self.dismiss(animated: true, completion: {
-                     self.delegate?.userDidScanWith(barcode: decodedURL)
-                    })
-                 }
-            }else{
-                self.dismiss(animated: true, completion: {
-                self.delegate?.userDidScanWith(barcode: decodedURL)
-                })
-            }
+            // if SwiftFlutterBarcodeScannerPlugin.isOrientationLandscape == true {
+            //      if decodedURL.count >= 44 && decodedURL.count <= 48 {
+            //         if #available(iOS 16.0, *) {
+            //             let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene
+            //             windowScene?.requestGeometryUpdate(.iOS(interfaceOrientations: .portrait))
+            //             updateUIAfterRotation();
+            //         }else{
+            //             setOrientation(to: .portrait)
+            //             updateUIAfterRotation();
+            //         }
+            //         self.dismiss(animated: true, completion: {
+            //          self.delegate?.userDidScanWith(barcode: decodedURL)
+            //         })
+            //      }
+            // }else{
+            //     self.dismiss(animated: true, completion: {
+            //     self.delegate?.userDidScanWith(barcode: decodedURL)
+            //     })
+            // }
             // setOrientation(to: .portrait)
+
+            if SwiftFlutterBarcodeScannerPlugin.isNeedLengthCondition == true && SwiftFlutterBarcodeScannerPlugin.minimunLengthMinusOne != "0" && SwiftFlutterBarcodeScannerPlugin.maximunLengthPlusOne != "0" {
+
+                var minNumber: Int
+                var maxNumber: Int
+
+                if let convertedNumber = Int(SwiftFlutterBarcodeScannerPlugin.minimunLengthMinusOne) {
+                    minNumber = convertedNumber
+                }
+                if let convertedNumber2 = Int(SwiftFlutterBarcodeScannerPlugin.maximunLengthPlusOne) {
+                    maxNumber = convertedNumber
+                }
+
+                
+                
+                if SwiftFlutterBarcodeScannerPlugin.isNeedOnlyDigitCondition == true {
+
+                    let isNumeric = decodedURL.allSatisfy { $0.isNumber }
+
+                    if isNumeric == true && decodedURL.count > minNumber && decodedURL.count < maxNumber {
+                        if SwiftFlutterBarcodeScannerPlugin.isOrientationLandscape == true {
+                            if #available(iOS 16.0, *) {
+                                let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene
+                                windowScene?.requestGeometryUpdate(.iOS(interfaceOrientations: .portrait))
+                                updateUIAfterRotation();
+                            }else{
+                                setOrientation(to: .portrait)
+                                updateUIAfterRotation();
+                            }
+                        }
+                        self.dismiss(animated: true, completion: {
+                        self.delegate?.userDidScanWith(barcode: decodedURL)
+                        })
+                 }
+
+
+
+
+                }else{
+                    if decodedURL.count > minNumber && decodedURL.count < maxNumber {
+                        if SwiftFlutterBarcodeScannerPlugin.isOrientationLandscape == true {
+                            if #available(iOS 16.0, *) {
+                                let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene
+                                windowScene?.requestGeometryUpdate(.iOS(interfaceOrientations: .portrait))
+                                updateUIAfterRotation();
+                            }else{
+                                setOrientation(to: .portrait)
+                                updateUIAfterRotation();
+                            }
+                        }
+                        self.dismiss(animated: true, completion: {
+                        self.delegate?.userDidScanWith(barcode: decodedURL)
+                        })
+                 }
+
+                }
+            }else{
+
+                if SwiftFlutterBarcodeScannerPlugin.isNeedOnlyDigitCondition == true {
+
+                    let isNumeric = decodedURL.allSatisfy { $0.isNumber }
+
+                    if isNumeric == true{
+                        if SwiftFlutterBarcodeScannerPlugin.isOrientationLandscape == true {
+                            if #available(iOS 16.0, *) {
+                                let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene
+                                windowScene?.requestGeometryUpdate(.iOS(interfaceOrientations: .portrait))
+                                updateUIAfterRotation();
+                            }else{
+                                setOrientation(to: .portrait)
+                                updateUIAfterRotation();
+                            }
+                        }
+                        self.dismiss(animated: true, completion: {
+                        self.delegate?.userDidScanWith(barcode: decodedURL)
+                        })
+                 }
+
+
+
+
+                }else{
+                    
+                        if SwiftFlutterBarcodeScannerPlugin.isOrientationLandscape == true {
+                            if #available(iOS 16.0, *) {
+                                let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene
+                                windowScene?.requestGeometryUpdate(.iOS(interfaceOrientations: .portrait))
+                                updateUIAfterRotation();
+                            }else{
+                                setOrientation(to: .portrait)
+                                updateUIAfterRotation();
+                            }
+                        }
+                        self.dismiss(animated: true, completion: {
+                        self.delegate?.userDidScanWith(barcode: decodedURL)
+                        })
+                 
+
+                }
+
+            }
             
         }
     }
