@@ -51,8 +51,12 @@ public class FlutterBarcodeScannerPlugin implements MethodCallHandler, ActivityR
     public static boolean isShowFlashIcon = false;
     public static boolean isShowInputIcon = false;
     public static boolean isOrientationLandscape = false;
+    public static boolean isNeedLengthCondition = false;
+    public static boolean isNeedOnlyDigitCondition = false;
     public static String changeInputIconPath = "";
     public static boolean isContinuousScan = false;
+    public static String minimunLengthMinusOne = "";
+    public static String maximunLengthPlusOne = "";
     public static String iconSize = "";
     public static String fontSize = "";
     public static String duration = "";
@@ -116,6 +120,10 @@ public class FlutterBarcodeScannerPlugin implements MethodCallHandler, ActivityR
                 isShowFlashIcon = (boolean) arguments.get("isShowFlashIcon");
                 isShowInputIcon = (boolean) arguments.get("isShowInputIcon");
                 isOrientationLandscape = (boolean) arguments.get("isOrientationLandscape");
+                isNeedLengthCondition = (boolean) arguments.get("isNeedLengthCondition");
+                isNeedOnlyDigitCondition = (boolean) arguments.get("isNeedOnlyDigitCondition");
+                minimunLengthMinusOne = (String) arguments.get("minimunLengthMinusOne");
+                maximunLengthPlusOne = (String) arguments.get("maximunLengthPlusOne");
                 iconSize = (String) arguments.get("iconSize");
                 fontSize = (String) arguments.get("fontSize");
                 duration = (String) arguments.get("duration");

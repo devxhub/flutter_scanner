@@ -56,6 +56,10 @@ class _MyAppState extends State<MyApp> {
           isShowFlashIcon: true,
           scanMode: ScanMode.QR,
           isShowInputIcon: true,
+          isNeedLengthCondition: true,
+          isNeedOnlyDigitCondition: true,
+          minimunLengthMinusOne: 1,
+          maximunLengthPlusOne: 5,
           iconSize: 50,
           fontSize: 20,
           flashOffIconPath: "assets/flashoff.png",
@@ -131,7 +135,7 @@ class _MyAppState extends State<MyApp> {
                             child: Text('start scan with duration')),
                         ElevatedButton(
                             onPressed: () => scanQR(),
-                            child: Text('Start QR scan')),
+                            child: Text('Start QR scan with Condition')),
                         ElevatedButton(
                             onPressed: () => scanBarcode(),
                             child: Text('Start Barcode scan')),
