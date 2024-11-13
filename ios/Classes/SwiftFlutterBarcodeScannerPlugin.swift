@@ -1072,16 +1072,13 @@ class BarcodeScannerViewController: UIViewController {
                 var minNumber: Int
                 var maxNumber: Int
 
+                
                 if let convertedNumber = Int(SwiftFlutterBarcodeScannerPlugin.minimunLengthMinusOne) {
                     minNumber = convertedNumber
-                }
-                if let convertedNumber2 = Int(SwiftFlutterBarcodeScannerPlugin.maximunLengthPlusOne) {
-                    maxNumber = convertedNumber
-                }
+                    if  let convertedNumber2 = Int(SwiftFlutterBarcodeScannerPlugin.maximunLengthPlusOne) {
+                    maxNumber = convertedNumber2
 
-                
-                
-                if SwiftFlutterBarcodeScannerPlugin.isNeedOnlyDigitCondition == true {
+                    if SwiftFlutterBarcodeScannerPlugin.isNeedOnlyDigitCondition == true{
 
                     let isNumeric = decodedURL.allSatisfy { $0.isNumber }
 
@@ -1122,6 +1119,12 @@ class BarcodeScannerViewController: UIViewController {
                  }
 
                 }
+                }
+                }
+
+                
+                
+                
             }else{
 
                 if SwiftFlutterBarcodeScannerPlugin.isNeedOnlyDigitCondition == true {
