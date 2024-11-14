@@ -1,6 +1,6 @@
 PODS:
   - Flutter (1.0.0)
-  - flutter_scanner_devxhub (1.0.2):
+  - flutter_scanner_devxhub (1.0.3):
     - Flutter
 
 DEPENDENCIES:

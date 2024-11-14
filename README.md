@@ -63,7 +63,7 @@ After making the changes in Android ans iOS add flutter_scanner_devxhub to `pubs
 ```
 dependencies:
   ...
-  flutter_scanner_devxhub: ^1.0.2
+  flutter_scanner_devxhub: ^1.0.3
 ```
 
 1. You need to import the package first.
@@ -80,6 +80,13 @@ String barcodeScanRes = await FlutterScanner.scanBarcode(
           cancelButtonText: 'Cancel',
           isShowFlashIcon: true,
           scanMode: ScanMode.QR,
+          isShowInputIcon: true,
+          changeInputIconPath: "assets/input.png" ,
+          isOrientationLandscape: true,
+          isNeedLengthCondition: true,
+          isNeedOnlyDigitCondition: true,
+          minimunLengthMinusOne: 10,
+          maximunLengthPlusOne: 50,
           iconSize: 50,
           fontSize: 20,
           duration: Duration(seconds: 20),
@@ -104,6 +111,20 @@ It shows the graphics overlay like for barcode and QR.
 `fontSize` is float value used to change size of cancel text,
 
 `duration` is Duration type value used to close scanner after that time,
+
+`isShowInputIcon` is extra button for close scanner and return -3,
+
+`changeInputIconPath` is String value used to change the input icon,
+
+`isOrientationLandscape` is bool value used to change the Orientation by force,
+
+`isNeedOnlyDigitCondition` is bool value used to only scan digit,
+
+`isNeedLengthCondition` is bool value used to get data by length condition,
+
+`minimunLengthMinusOne` is int value used to check minimum length value - 1,
+
+`maximunLengthPlusOne` is int value used to check maximum length value + 1,
 
 `flashIconPath` is String value used to change the flash icon,
 

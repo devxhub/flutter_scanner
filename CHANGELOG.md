@@ -1,4 +1,11 @@
-## 1.0.1
+## 1.0.3
+
+- add force orientation change
+- add length condition
+- add only digit option
+- add optional extra button
+
+## 1.0.2
 
 - Update with timer duration
 
