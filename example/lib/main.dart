@@ -55,6 +55,38 @@ class _MyAppState extends State<MyApp> {
           cancelButtonText: 'Cancel',
           isShowFlashIcon: true,
           scanMode: ScanMode.QR,
+          isShowInputIcon: true,
+          isOrientationLandscape: true,
+          isNeedLengthCondition: true,
+          isNeedOnlyDigitCondition: true,
+          minimunLengthMinusOne: 10,
+          maximunLengthPlusOne: 50,
+          iconSize: 50,
+          fontSize: 20,
+          flashOffIconPath: "assets/flashoff.png",
+          flashIconPath: "assets/flash.png",
+          changeCameraIconPath: "assets/camera.png");
+      print(barcodeScanRes);
+    } on PlatformException {
+      barcodeScanRes = 'Failed to get platform version.';
+    }
+    if (!mounted) return;
+
+    setState(() {
+      _scanBarcode = barcodeScanRes;
+    });
+  }
+
+  Future<void> scanBarcode() async {
+    String barcodeScanRes;
+    try {
+      barcodeScanRes = await FlutterScanner.scanBarcode(
+          lineColor: '#ff6666',
+          cancelButtonText: 'Cancel',
+          isShowFlashIcon: true,
+          isOrientationLandscape: true,
+          isShowInputIcon: true,
+          scanMode: ScanMode.BARCODE,
           iconSize: 50,
           fontSize: 20,
           flashOffIconPath: "assets/flashoff.png",
@@ -104,7 +136,10 @@ class _MyAppState extends State<MyApp> {
                             child: Text('start scan with duration')),
                         ElevatedButton(
                             onPressed: () => scanQR(),
-                            child: Text('Start QR scan')),
+                            child: Text('Start QR scan with Condition')),
+                        ElevatedButton(
+                            onPressed: () => scanBarcode(),
+                            child: Text('Start Barcode scan')),
                         ElevatedButton(
                             onPressed: () => scanQrDefault(),
                             child: Text('Start QR scan default')),

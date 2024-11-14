@@ -25,14 +25,15 @@ import android.hardware.Camera;
 import android.hardware.Camera.CameraInfo;
 import android.os.Build;
 import android.os.SystemClock;
-import androidx.annotation.Nullable;
-import androidx.annotation.RequiresPermission;
-import androidx.annotation.StringDef;
-
+import android.util.Log;
 import android.view.Surface;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.WindowManager;
+
+import androidx.annotation.Nullable;
+import androidx.annotation.RequiresPermission;
+import androidx.annotation.StringDef;
 
 import com.google.android.gms.common.images.Size;
 import com.google.android.gms.vision.Detector;
@@ -93,7 +94,7 @@ public class CameraSource {
      * buffer.  We use byte buffers internally because this is a more efficient way to call into
      * native code later (avoids a potential copy).
      */
-    private Map<byte[], ByteBuffer> mBytesToByteBuffer = new HashMap<>();
+    private final Map<byte[], ByteBuffer> mBytesToByteBuffer = new HashMap<>();
 
 
     @StringDef({
@@ -125,7 +126,7 @@ public class CameraSource {
      */
     public static class Builder {
         private final Detector<?> mDetector;
-        private CameraSource mCameraSource = new CameraSource();
+        private final CameraSource mCameraSource = new CameraSource();
 
         /**
          * Creates a camera source builder with the supplied context and detector.  Camera preview
@@ -422,8 +423,52 @@ public class CameraSource {
             } else if (currentZoom > maxZoom) {
                 currentZoom = maxZoom;
             }
+            Log.d("DDDDDDDDDDD", "doZoom: " + currentZoom);
             parameters.setZoom(currentZoom);
             mCamera.setParameters(parameters);
+            return currentZoom;
+        }
+    }
+    public int doZoomToggle() {
+        synchronized (mCameraLock) {
+            if (mCamera == null) {
+                return 0;
+            }
+            int currentZoom = 0;
+            int maxZoom;
+            Camera.Parameters parameters = mCamera.getParameters();
+            if (!parameters.isZoomSupported()) {
+                return currentZoom;
+            }
+            maxZoom = parameters.getMaxZoom();
+
+            currentZoom = parameters.getZoom() + 1;
+            float newZoom;
+//            if (scale > 1) {
+//                newZoom = currentZoom + scale * (maxZoom / 10);
+//            } else {
+//                newZoom = currentZoom * scale;
+//            }
+//            currentZoom = Math.round(newZoom) - 1;
+
+//            Log.d("DDDDDDDDDDD", "doZoomToggle: " + maxZoom);
+            Log.d("DDDDDDDDDDD", "doZoomToggle: " + currentZoom);
+            if (currentZoom < 5) {
+                parameters.setZoom(40);
+                parameters.setFocusMode(Camera.Parameters.FOCUS_MODE_MACRO);
+                mCamera.setParameters(parameters);
+                mCamera.autoFocus(null);
+                Log.d("DDDDDDDDDDD", "doZoomToggle: FOCUS_MODE_AUTO" + currentZoom);
+            } else {
+                parameters.setZoom(0);
+                parameters.setFocusMode(Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE);
+                mCamera.setParameters(parameters);
+
+                Log.d("DDDDDDDDDDD", "doZoomToggle: FOCUS_MODE_CONTINUOUS_PICTURE" + currentZoom);
+            }
+            Log.d("DDDDDDDDDDD", "doZoomToggle: " + currentZoom);
+
+
             return currentZoom;
         }
     }
@@ -486,6 +531,23 @@ public class CameraSource {
                     mFocusMode = mode;
                     return true;
                 }
+            }
+
+            return false;
+        }
+    }
+
+    public boolean isMacroModeAvailable() {
+        synchronized (mCameraLock) {
+            if (mCamera != null) {
+                Camera.Parameters parameters = mCamera.getParameters();
+
+                List<String> supportedFocusModes = parameters.getSupportedFocusModes();
+
+                // This camera supports FOCUS_MODE_MACRO
+                // FOCUS_MODE_MACRO is not supported, use a fallback mode
+                // or any other fallback mode
+                return supportedFocusModes != null && supportedFocusModes.contains(Camera.Parameters.FOCUS_MODE_MACRO);
             }
 
             return false;
@@ -814,7 +876,7 @@ public class CameraSource {
      * size is null, then there is no picture size with the same aspect ratio as the preview size.
      */
     private static class SizePair {
-        private Size mPreview;
+        private final Size mPreview;
         private Size mPicture;
 
         public SizePair(android.hardware.Camera.Size previewSize,
@@ -946,7 +1008,7 @@ public class CameraSource {
 
     private class FrameProcessingRunnable implements Runnable {
         private Detector<?> mDetector;
-        private long mStartTimeMillis = SystemClock.elapsedRealtime();
+        private final long mStartTimeMillis = SystemClock.elapsedRealtime();
 
         // This lock guards all of the member variables below.
         private final Object mLock = new Object();
@@ -1040,7 +1102,7 @@ public class CameraSource {
 
     public Camera.Size getOptimalPreviewSize(List<Camera.Size> sizes, int w, int h) {
         final double ASPECT_TOLERANCE = 0.1;
-        double targetRatio=(double)h / w;
+        double targetRatio = (double) h / w;
 
         if (sizes == null) return null;
 

@@ -16,22 +16,30 @@ public class SwiftFlutterBarcodeScannerPlugin: NSObject, FlutterPlugin, ScanBarc
     var registrar: FlutterPluginRegistrar? = nil
     public static var viewController = UIViewController()
     public static var lineColor:String=""
+    public static var minimunLengthMinusOne:String=""
+    public static var maximunLengthPlusOne:String=""
     public static var iconSize:String=""
     public static var fontSize:String=""
     public static var duration:String=""
     public static var changeCameraIconPath:String=""
+    public static var changeInputIconPath:String=""
     public static var flashIconPath:String=""
     public static var flashOffIconPath:String=""
     public static var cancelButtonText:String=""
-    public static var isShowFlashIcon:Bool=false
     public static var cameraSwitchImage:UIImage?
+    public static var InputIconImage:UIImage?
+    public static var isShowFlashIcon:Bool=false
+    public static var isShowInputIcon:Bool=false
     public static var flashIconImage:UIImage?
     public static var flashOffIconImage:UIImage?
     var pendingResult:FlutterResult!
     public static var isContinuousScan:Bool=false
+    public static var isOrientationLandscape:Bool=false
+    public static var isNeedLengthCondition:Bool=false
+    public static var isNeedOnlyDigitCondition:Bool=false
     static var barcodeStream:FlutterEventSink?=nil
     public static var scanMode = ScanMode.QR.index
-//    let flutterEngine = FlutterEngine(name: "my_flutter_engine")
+    let flutterEngine = FlutterEngine(name: "my_flutter_engine")
     
     public static func register(with registrar: FlutterPluginRegistrar) {
         viewController = (UIApplication.shared.delegate?.window??.rootViewController)!
@@ -64,12 +72,14 @@ public class SwiftFlutterBarcodeScannerPlugin: NSObject, FlutterPlugin, ScanBarc
         return nil
     }
     
+    
+    
     public static func onBarcodeScanReceiver( barcode:String){
         barcodeStream!(barcode)
     }
     
     public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
-//        flutterEngine.run()
+        flutterEngine.run()
         let args:Dictionary<String, AnyObject> = call.arguments as! Dictionary<String, AnyObject>;
         if let colorCode = args["lineColor"] as? String{
             SwiftFlutterBarcodeScannerPlugin.lineColor = colorCode
@@ -81,10 +91,18 @@ public class SwiftFlutterBarcodeScannerPlugin: NSObject, FlutterPlugin, ScanBarc
         }else {
             SwiftFlutterBarcodeScannerPlugin.cancelButtonText = "Cancel"
         }
-
+        
         if let iconSize = args["iconSize"] as? String{
             SwiftFlutterBarcodeScannerPlugin.iconSize = iconSize
         }
+        
+        if let minimunLengthMinusOne = args["minimunLengthMinusOne"] as? String{
+            SwiftFlutterBarcodeScannerPlugin.minimunLengthMinusOne = minimunLengthMinusOne
+        }
+        if let maximunLengthPlusOne = args["maximunLengthPlusOne"] as? String{
+            SwiftFlutterBarcodeScannerPlugin.maximunLengthPlusOne = maximunLengthPlusOne
+        }
+
         if let fontSize = args["fontSize"] as? String{
             SwiftFlutterBarcodeScannerPlugin.fontSize = fontSize
         }
@@ -118,17 +136,51 @@ public class SwiftFlutterBarcodeScannerPlugin: NSObject, FlutterPlugin, ScanBarc
             }
             
         }
-
-
+        if let changeInputIconPath = args["changeInputIconPath"] as? String{
+            SwiftFlutterBarcodeScannerPlugin.changeInputIconPath = changeInputIconPath
+            if changeInputIconPath != ""{
+                let key = registrar?.lookupKey(forAsset: changeInputIconPath)
+                let imagePath = Bundle.main.path(forResource: key, ofType: nil)!
+                SwiftFlutterBarcodeScannerPlugin.InputIconImage = UIImage(contentsOfFile: imagePath)!
+            }
+            
+        }
+        
+        
         if let flashStatus = args["isShowFlashIcon"] as? Bool{
             SwiftFlutterBarcodeScannerPlugin.isShowFlashIcon = flashStatus
         }else {
             SwiftFlutterBarcodeScannerPlugin.isShowFlashIcon = false
         }
+        if let inputIconStatus = args["isShowInputIcon"] as? Bool{
+            SwiftFlutterBarcodeScannerPlugin.isShowInputIcon = inputIconStatus
+        }else {
+            SwiftFlutterBarcodeScannerPlugin.isShowInputIcon = false
+        }
         if let isContinuousScan = args["isContinuousScan"] as? Bool{
             SwiftFlutterBarcodeScannerPlugin.isContinuousScan = isContinuousScan
         }else {
             SwiftFlutterBarcodeScannerPlugin.isContinuousScan = false
+        }
+        
+        if let isOrientationLandscape = args["isOrientationLandscape"] as? Bool{
+            SwiftFlutterBarcodeScannerPlugin.isOrientationLandscape = isOrientationLandscape
+        }else {
+            SwiftFlutterBarcodeScannerPlugin.isOrientationLandscape = false
+        }
+        
+
+        if let isNeedLengthCondition = args["isNeedLengthCondition"] as? Bool{
+            SwiftFlutterBarcodeScannerPlugin.isNeedLengthCondition = isNeedLengthCondition
+        }else {
+            SwiftFlutterBarcodeScannerPlugin.isNeedLengthCondition = false
+        }
+        
+
+        if let isNeedOnlyDigitCondition = args["isNeedOnlyDigitCondition"] as? Bool{
+            SwiftFlutterBarcodeScannerPlugin.isNeedOnlyDigitCondition = isNeedOnlyDigitCondition
+        }else {
+            SwiftFlutterBarcodeScannerPlugin.isNeedOnlyDigitCondition = false
         }
         
         if let scanModeReceived = args["scanMode"] as? Int {
@@ -151,18 +203,57 @@ public class SwiftFlutterBarcodeScannerPlugin: NSObject, FlutterPlugin, ScanBarc
             controller.modalPresentationStyle = .fullScreen
         }
         
+        // if SwiftFlutterBarcodeScannerPlugin.isOrientationLandscape == true {
+        //     controller.setOrientation(to: .landscapeRight)
+        // }
+        
+        
+        
+        
+        // SwiftFlutterBarcodeScannerPlugin.viewController.present(controller
+        //                                                                            , animated: true) {
+        
+        //                    }
+        
         if checkCameraAvailability(){
             if checkForCameraPermission() {
-                SwiftFlutterBarcodeScannerPlugin.viewController.present(controller
+                DispatchQueue.main.async {
+                    if SwiftFlutterBarcodeScannerPlugin.isOrientationLandscape == true {
+                        if #available(iOS 16.0, *) {
+                            let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene
+                            windowScene?.requestGeometryUpdate(.iOS(interfaceOrientations: .landscapeRight))
+                            // controller.videoPreviewLayer?.connection?.videoOrientation = AVCaptureVideoOrientation.landscapeLeft
+                            controller.updateUIAfterRotation();
+                        }else{
+                            controller.setOrientation(to: .landscapeRight)
+                            // controller.videoPreviewLayer?.connection?.videoOrientation = AVCaptureVideoOrientation.landscapeLeft
+                            controller.updateUIAfterRotation();
+                        }
+                    }
+                    
+                    SwiftFlutterBarcodeScannerPlugin.viewController.present(controller
                                                                             , animated: true) {
                         
                     }
+                }
                 
             }else {
                 
                 AVCaptureDevice.requestAccess(for: .video) { success in
                     DispatchQueue.main.async {
                         if success {
+                            if SwiftFlutterBarcodeScannerPlugin.isOrientationLandscape == true {
+                                if #available(iOS 16.0, *) {
+                                    let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene
+                                    windowScene?.requestGeometryUpdate(.iOS(interfaceOrientations: .landscapeRight))
+                                    // controller.videoPreviewLayer?.connection?.videoOrientation = AVCaptureVideoOrientation.landscapeLeft
+                                    controller.updateUIAfterRotation();
+                                }else{
+                                    controller.setOrientation(to: .landscapeRight)
+                                    // controller.videoPreviewLayer?.connection?.videoOrientation = AVCaptureVideoOrientation.landscapeLeft
+                                    controller.updateUIAfterRotation();
+                                }
+                            }
                             SwiftFlutterBarcodeScannerPlugin.viewController.present(controller
                                                                                     , animated: true) {
                                 
@@ -183,11 +274,12 @@ public class SwiftFlutterBarcodeScannerPlugin: NSObject, FlutterPlugin, ScanBarc
             }
         }else {
             
-             showAlertDialog(title: "Unable to proceed", message: "Camera not available")
+            showAlertDialog(title: "Unable to proceed", message: "Camera not available")
         }
     }
     
     public func userDidScanWith(barcode: String){
+        
         pendingResult(barcode)
     }
     
@@ -231,39 +323,66 @@ class BarcodeScannerViewController: UIViewController {
     private var isOrientationPortrait = true
     var screenHeight:CGFloat = 0
     let captureMetadataOutput = AVCaptureMetadataOutput()
-
-
+    
+    
     var timer: Timer?
     var secondsRemaining = 10
-
     
-
+    
+    
     func startTimer() {
         timer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { [weak self] timer in
             guard let self = self else { return }
             self.secondsRemaining   -= 1
-
+            
             if self.secondsRemaining == 0 {
                 timer.invalidate()
                 self.handleTimeout()
             }
         }
     }
-
+    // let controller = BarcodeScannerViewController()
+    //         controller.setOrientation(to: .portrait)
     func handleTimeout() {
-        
+        if SwiftFlutterBarcodeScannerPlugin.isOrientationLandscape == true {
+            if #available(iOS 16.0, *) {
+                let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene
+                windowScene?.requestGeometryUpdate(.iOS(interfaceOrientations: .portrait))
+                updateUIAfterRotation();
+            }else{
+                setOrientation(to: .portrait)
+                updateUIAfterRotation();
+            }
+        }
+        // setOrientation(to: .portrait)
         self.dismiss(animated: true, completion: {
-                    self.delegate?.userDidScanWith(barcode: "-2")
-                })
+            self.delegate?.userDidScanWith(barcode: "-2")
+        })
     }
+    
+    // override var supportedInterfaceOrientations: UIInterfaceOrientationMask {
+    // return .landscape // or .portrait, .all, etc., depending on your needs
+    // }
+    
+    func setOrientation(to orientation: UIInterfaceOrientation) {
+        UIDevice.current.setValue(orientation.rawValue, forKey: "orientation")
+        UIViewController.attemptRotationToDeviceOrientation()
+    }
+    
+    override var supportedInterfaceOrientations: UIInterfaceOrientationMask {
+        return [.portrait, .landscapeRight]
+    }
+    
+    
+    
     
     private lazy var xCor: CGFloat! = {
         return self.isOrientationPortrait ? (screenSize.width - (screenSize.width*0.8))/2 :
-            (screenSize.width - (screenSize.width*0.6))/2
+        (screenSize.width - (screenSize.width*0.6))/2
     }()
     private lazy var yCor: CGFloat! = {
         return self.isOrientationPortrait ? (screenSize.height - (screenSize.width*0.8))/2 :
-            (screenSize.height - (screenSize.height*0.8))/2
+        (screenSize.height - (screenSize.height*0.8))/2
     }()
     //Bottom view
     private lazy var bottomView : UIView! = {
@@ -292,8 +411,8 @@ class BarcodeScannerViewController: UIViewController {
         
         flashButton.addTarget(self, action: #selector(BarcodeScannerViewController.flashButtonClicked), for: .touchUpInside)
         
-       
-       
+        
+        
         if iconSizeString != "0", let iconSize = NumberFormatter().number(from: iconSizeString){
             let iconSizeCGFloat = CGFloat(truncating: iconSize)
             flashButton.widthAnchor.constraint(equalToConstant: iconSizeCGFloat).isActive = true
@@ -314,10 +433,10 @@ class BarcodeScannerViewController: UIViewController {
         let button = UIButton()
         let iconSizeString = SwiftFlutterBarcodeScannerPlugin.iconSize
         let changeCameraIconPath = SwiftFlutterBarcodeScannerPlugin.changeCameraIconPath
-
+        
         button.translatesAutoresizingMaskIntoConstraints = false
         let originalImage = UIImage(named: "ic_switch_camera", in: Bundle(for: SwiftFlutterBarcodeScannerPlugin.self), compatibleWith: nil)
-
+        
         button.setImage(originalImage,for: .normal)
         
         if changeCameraIconPath != "" {
@@ -341,8 +460,39 @@ class BarcodeScannerViewController: UIViewController {
         
         return button
     }()
+    /// Create and return Input Icon button
+    private lazy var InputButton : UIButton! = {
+        let button = UIButton()
+        let iconSizeString = SwiftFlutterBarcodeScannerPlugin.iconSize
+        let changeInputIconPath = SwiftFlutterBarcodeScannerPlugin.changeInputIconPath
+        
+        button.translatesAutoresizingMaskIntoConstraints = false
+        let originalImage = UIImage(named: "keypad", in: Bundle(for: SwiftFlutterBarcodeScannerPlugin.self), compatibleWith: nil)
+        
+        button.setImage(originalImage,for: .normal)
+        
+        if changeInputIconPath != "" {
+            button.setImage(SwiftFlutterBarcodeScannerPlugin.InputIconImage,for: .normal)
+        }
+        
+        
+        if iconSizeString != "0", let iconSize = NumberFormatter().number(from: iconSizeString){
+            let iconSizeCGFloat = CGFloat(truncating: iconSize)
+            button.widthAnchor.constraint(equalToConstant: iconSizeCGFloat).isActive = true
+            button.heightAnchor.constraint(equalToConstant: iconSizeCGFloat).isActive = true
+            if changeInputIconPath != "" {
+                let resizedImage = resizeImage(image: SwiftFlutterBarcodeScannerPlugin.InputIconImage!, targetSize: CGSize(width: iconSizeCGFloat, height: iconSizeCGFloat))
+                button.setImage(resizedImage, for: .normal)
+            }else{
+                let resizedImage = resizeImage(image: originalImage!, targetSize: CGSize(width: iconSizeCGFloat, height: iconSizeCGFloat))
+                button.setImage(resizedImage, for: .normal)
+            }
+        }
+        button.addTarget(self, action: #selector(BarcodeScannerViewController.inputButtonClicked), for: .touchUpInside)
+        return button
+    }()
     
-
+    
     /// Create and return cancel button
     public lazy var cancelButton: UIButton! = {
         let view = UIButton()
@@ -360,9 +510,14 @@ class BarcodeScannerViewController: UIViewController {
     
     override public func viewDidLoad() {
         super.viewDidLoad()
-        self.isOrientationPortrait = isLandscape
+        
+        // self.isOrientationPortrait = isLandscape
+        // updateUIAfterRotation();
+        self.isOrientationPortrait = SwiftFlutterBarcodeScannerPlugin.isOrientationLandscape == true ? false : isLandscape
         self.initUIComponents()
-
+        
+        
+        
         let durationString = SwiftFlutterBarcodeScannerPlugin.duration
         if durationString != "0", let duration = NumberFormatter().number(from: durationString){
             let durationCGInt = Int(truncating: duration)
@@ -376,7 +531,7 @@ class BarcodeScannerViewController: UIViewController {
         super.viewWillAppear(animated)
         self.moveVertically()
     }
-
+    
     override public func viewDidDisappear(_ animated: Bool){
         // Stop video capture
         captureSession.stopRunning()
@@ -508,6 +663,9 @@ class BarcodeScannerViewController: UIViewController {
             if(!SwiftFlutterBarcodeScannerPlugin.isShowFlashIcon){
                 flashIcon.isHidden=true
             }
+            if(!SwiftFlutterBarcodeScannerPlugin.isShowInputIcon){
+                InputButton.isHidden=true
+            }
             qrCodeFrameView.layoutIfNeeded()
             qrCodeFrameView.layoutSubviews()
             qrCodeFrameView.setNeedsUpdateConstraints()
@@ -522,9 +680,10 @@ class BarcodeScannerViewController: UIViewController {
     /// Apply constraints to ui components
     private func setConstraintsForControls() {
         self.view.addSubview(bottomView)
-        self.view.addSubview(cancelButton)
-        self.view.addSubview(flashIcon)
-        self.view.addSubview(switchCameraButton)
+        // self.view.addSubview(cancelButton)
+        // self.view.addSubview(flashIcon)
+        // self.view.addSubview(InputButton)
+        // self.view.addSubview(switchCameraButton)
         
         
         bottomView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant:0).isActive = true
@@ -532,49 +691,78 @@ class BarcodeScannerViewController: UIViewController {
         bottomView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant:0).isActive = true
         bottomView.heightAnchor.constraint(equalToConstant:self.isOrientationPortrait ? 100.0 : 70.0).isActive=true
         
-        flashIcon.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
-//        flashIcon.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -10).isActive = true
-//        flashIcon.heightAnchor.constraint(equalToConstant: 40.0).isActive = true
-//        flashIcon.widthAnchor.constraint(equalToConstant: 40.0).isActive = true
+        // Initialize stack view
+        let stackView = UIStackView(arrangedSubviews: [switchCameraButton, InputButton, flashIcon, cancelButton])
+        stackView.axis = .horizontal  // Horizontal arrangement of buttons
+        stackView.alignment = .center // Center buttons vertically
+        stackView.distribution = .equalSpacing // Space buttons equally with dynamic space
+        stackView.spacing = 10 // Minimum spacing between buttons
         
-        cancelButton.translatesAutoresizingMaskIntoConstraints = false
-        cancelButton.widthAnchor.constraint(equalToConstant: 200.0).isActive = true
+        // Add stack view to the view hierarchy
+        self.view.addSubview(stackView)
         
-//        cancelButton.bottomAnchor.constraint(equalTo:view.bottomAnchor,constant: 0).isActive=true
-        cancelButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant:10).isActive = true
-        cancelButton.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -10).isActive = true
+        // Disable autoresizing masks for the stack view
+        stackView.translatesAutoresizingMaskIntoConstraints = false
         
-        switchCameraButton.translatesAutoresizingMaskIntoConstraints = false
-        // A little bit to the right.
-        switchCameraButton.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 10).isActive = true
-    
         
-//        switchCameraButton.heightAnchor.constraint(equalToConstant: 70.0).isActive = true
-//        switchCameraButton.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -10).isActive = true
+        stackView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant:20).isActive = true
+        stackView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant:-20).isActive = true
+        stackView.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: 0).isActive = true
         
-        switchCameraButton.centerYAnchor.constraint(equalTo: bottomView.centerYAnchor).isActive = true
-        cancelButton.centerYAnchor.constraint(equalTo: bottomView.centerYAnchor).isActive = true
-        flashIcon.centerYAnchor.constraint(equalTo: bottomView.centerYAnchor).isActive = true
+        // // Set constraints for the stack view to fill the bottomView
+        // stackView.leadingAnchor.constraint(equalTo: bottomView.leadingAnchor, constant: 20).isActive = true
+        // stackView.trailingAnchor.constraint(equalTo: bottomView.trailingAnchor, constant: -20).isActive = true
+        // stackView.centerYAnchor.constraint(equalTo: bottomView.centerYAnchor).isActive = true
+        // stackView.heightAnchor.constraint(equalToConstant: 50).isActive = true // Adjust height as needed
+        
+        
+        //         flashIcon.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
+        // //        flashIcon.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -10).isActive = true
+        // //        flashIcon.heightAnchor.constraint(equalToConstant: 40.0).isActive = true
+        // //        flashIcon.widthAnchor.constraint(equalToConstant: 40.0).isActive = true
+        
+        //         cancelButton.translatesAutoresizingMaskIntoConstraints = false
+        //         cancelButton.widthAnchor.constraint(equalToConstant: 200.0).isActive = true
+        
+        // //        cancelButton.bottomAnchor.constraint(equalTo:view.bottomAnchor,constant: 0).isActive=true
+        //         cancelButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant:10).isActive = true
+        //         cancelButton.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -10).isActive = true
+        
+        //         switchCameraButton.translatesAutoresizingMaskIntoConstraints = false
+        //         // A little bit to the right.
+        //         switchCameraButton.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 10).isActive = true
+        
+        
+        // //        switchCameraButton.heightAnchor.constraint(equalToConstant: 70.0).isActive = true
+        // //        switchCameraButton.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -10).isActive = true
+        
+        //         switchCameraButton.centerYAnchor.constraint(equalTo: bottomView.centerYAnchor).isActive = true
+        //         cancelButton.centerYAnchor.constraint(equalTo: bottomView.centerYAnchor).isActive = true
+        //         flashIcon.centerYAnchor.constraint(equalTo: bottomView.centerYAnchor).isActive = true
         
         let iconSizeString = SwiftFlutterBarcodeScannerPlugin.iconSize
-            if iconSizeString != "0", let iconSize = NumberFormatter().number(from: iconSizeString) {
-                let iconSizeCGFloat = CGFloat(truncating: iconSize)
-                print(iconSizeCGFloat);
-               
-                flashIcon.widthAnchor.constraint(equalToConstant: iconSizeCGFloat).isActive = true
-                flashIcon.heightAnchor.constraint(equalToConstant: iconSizeCGFloat).isActive = true
-//                flashIcon.frame = CGRect(x: 0, y: 0, width: iconSizeCGFloat, height: iconSizeCGFloat)
-                switchCameraButton.widthAnchor.constraint(equalToConstant: iconSizeCGFloat).isActive = true
-                switchCameraButton.heightAnchor.constraint(equalToConstant: iconSizeCGFloat).isActive = true
-                cancelButton.heightAnchor.constraint(equalToConstant: iconSizeCGFloat+20.0).isActive = true
-                
-            }else {
-                switchCameraButton.heightAnchor.constraint(equalToConstant: 40.0).isActive = true
-                switchCameraButton.widthAnchor.constraint(equalToConstant: 40.0).isActive = true
-                flashIcon.heightAnchor.constraint(equalToConstant: 40.0).isActive = true
-                flashIcon.widthAnchor.constraint(equalToConstant: 40.0).isActive = true
-                cancelButton.heightAnchor.constraint(equalToConstant: 70.0).isActive = true
-            }
+        if iconSizeString != "0", let iconSize = NumberFormatter().number(from: iconSizeString) {
+            let iconSizeCGFloat = CGFloat(truncating: iconSize)
+            print(iconSizeCGFloat);
+            
+            flashIcon.widthAnchor.constraint(equalToConstant: iconSizeCGFloat).isActive = true
+            flashIcon.heightAnchor.constraint(equalToConstant: iconSizeCGFloat).isActive = true
+            InputButton.widthAnchor.constraint(equalToConstant: iconSizeCGFloat).isActive = true
+            InputButton.heightAnchor.constraint(equalToConstant: iconSizeCGFloat).isActive = true
+            //                flashIcon.frame = CGRect(x: 0, y: 0, width: iconSizeCGFloat, height: iconSizeCGFloat)
+            switchCameraButton.widthAnchor.constraint(equalToConstant: iconSizeCGFloat).isActive = true
+            switchCameraButton.heightAnchor.constraint(equalToConstant: iconSizeCGFloat).isActive = true
+            cancelButton.heightAnchor.constraint(equalToConstant: iconSizeCGFloat+20.0).isActive = true
+            
+        }else {
+            switchCameraButton.heightAnchor.constraint(equalToConstant: 40.0).isActive = true
+            switchCameraButton.widthAnchor.constraint(equalToConstant: 40.0).isActive = true
+            flashIcon.heightAnchor.constraint(equalToConstant: 40.0).isActive = true
+            flashIcon.widthAnchor.constraint(equalToConstant: 40.0).isActive = true
+            InputButton.heightAnchor.constraint(equalToConstant: 40.0).isActive = true
+            InputButton.widthAnchor.constraint(equalToConstant: 40.0).isActive = true
+            cancelButton.heightAnchor.constraint(equalToConstant: 70.0).isActive = true
+        }
     }
     
     /// Flash button click event listener
@@ -692,14 +880,73 @@ class BarcodeScannerViewController: UIViewController {
     /// Cancel button click event listener
     @IBAction private func cancelButtonClicked() {
         if SwiftFlutterBarcodeScannerPlugin.isContinuousScan{
+            if SwiftFlutterBarcodeScannerPlugin.isOrientationLandscape == true {
+                if #available(iOS 16.0, *) {
+                    let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene
+                    windowScene?.requestGeometryUpdate(.iOS(interfaceOrientations: .portrait))
+                    updateUIAfterRotation();
+                }else{
+                    setOrientation(to: .portrait)
+                    updateUIAfterRotation();
+                }
+            }
+            // setOrientation(to: .portrait)
             self.dismiss(animated: true, completion: {
                 SwiftFlutterBarcodeScannerPlugin.onBarcodeScanReceiver(barcode: "-1")
             })
         }else{
-            // Todo 
+            // Todo
             if self.delegate != nil {
+                if SwiftFlutterBarcodeScannerPlugin.isOrientationLandscape == true {
+                    if #available(iOS 16.0, *) {
+                        let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene
+                        windowScene?.requestGeometryUpdate(.iOS(interfaceOrientations: .portrait))
+                        updateUIAfterRotation();
+                    }else{
+                        setOrientation(to: .portrait)
+                        updateUIAfterRotation();
+                    }
+                }
+                // setOrientation(to: .portrait)
                 self.dismiss(animated: true, completion: {
                     self.delegate?.userDidScanWith(barcode: "-1")
+                })
+            }
+        }
+    }
+    /// Cancel button click event listener
+    @IBAction private func inputButtonClicked() {
+        if SwiftFlutterBarcodeScannerPlugin.isContinuousScan{
+            if SwiftFlutterBarcodeScannerPlugin.isOrientationLandscape == true {
+                if #available(iOS 16.0, *) {
+                    let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene
+                    windowScene?.requestGeometryUpdate(.iOS(interfaceOrientations: .portrait))
+                    updateUIAfterRotation();
+                }else{
+                    setOrientation(to: .portrait)
+                    updateUIAfterRotation();
+                }
+            }
+            // setOrientation(to: .portrait)
+            self.dismiss(animated: true, completion: {
+                SwiftFlutterBarcodeScannerPlugin.onBarcodeScanReceiver(barcode: "-3")
+            })
+        }else{
+            // Todo
+            if self.delegate != nil {
+                if SwiftFlutterBarcodeScannerPlugin.isOrientationLandscape == true {
+                    if #available(iOS 16.0, *) {
+                        let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene
+                        windowScene?.requestGeometryUpdate(.iOS(interfaceOrientations: .portrait))
+                        updateUIAfterRotation();
+                    }else{
+                        setOrientation(to: .portrait)
+                        updateUIAfterRotation();
+                    }
+                }
+                // setOrientation(to: .portrait)
+                self.dismiss(animated: true, completion: {
+                    self.delegate?.userDidScanWith(barcode: "-3")
                 })
             }
         }
@@ -790,8 +1037,8 @@ class BarcodeScannerViewController: UIViewController {
     
     var isLandscape: Bool {
         return UIDevice.current.orientation.isValidInterfaceOrientation
-            ? UIDevice.current.orientation.isPortrait
-            : UIApplication.shared.statusBarOrientation.isPortrait
+        ? UIDevice.current.orientation.isPortrait
+        : UIApplication.shared.statusBarOrientation.isPortrait
     }
     
     private func launchApp(decodedURL: String) {
@@ -799,9 +1046,131 @@ class BarcodeScannerViewController: UIViewController {
             return
         }
         if self.delegate != nil {
-            self.dismiss(animated: true, completion: {
-                self.delegate?.userDidScanWith(barcode: decodedURL)
-            })
+            // if SwiftFlutterBarcodeScannerPlugin.isOrientationLandscape == true {
+            //      if decodedURL.count >= 44 && decodedURL.count <= 48 {
+            //         if #available(iOS 16.0, *) {
+            //             let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene
+            //             windowScene?.requestGeometryUpdate(.iOS(interfaceOrientations: .portrait))
+            //             updateUIAfterRotation();
+            //         }else{
+            //             setOrientation(to: .portrait)
+            //             updateUIAfterRotation();
+            //         }
+            //         self.dismiss(animated: true, completion: {
+            //          self.delegate?.userDidScanWith(barcode: decodedURL)
+            //         })
+            //      }
+            // }else{
+            //     self.dismiss(animated: true, completion: {
+            //     self.delegate?.userDidScanWith(barcode: decodedURL)
+            //     })
+            // }
+            // setOrientation(to: .portrait)
+
+            if SwiftFlutterBarcodeScannerPlugin.isNeedLengthCondition == true && SwiftFlutterBarcodeScannerPlugin.minimunLengthMinusOne != "0" && SwiftFlutterBarcodeScannerPlugin.maximunLengthPlusOne != "0" {
+
+                var minNumber: Int
+                var maxNumber: Int
+
+                
+                if let convertedNumber = Int(SwiftFlutterBarcodeScannerPlugin.minimunLengthMinusOne) {
+                    minNumber = convertedNumber
+                    if  let convertedNumber2 = Int(SwiftFlutterBarcodeScannerPlugin.maximunLengthPlusOne) {
+                    maxNumber = convertedNumber2
+
+                    if SwiftFlutterBarcodeScannerPlugin.isNeedOnlyDigitCondition == true{
+
+                    let isNumeric = decodedURL.allSatisfy { $0.isNumber }
+
+                    if isNumeric == true && decodedURL.count > minNumber && decodedURL.count < maxNumber {
+                        if SwiftFlutterBarcodeScannerPlugin.isOrientationLandscape == true {
+                            if #available(iOS 16.0, *) {
+                                let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene
+                                windowScene?.requestGeometryUpdate(.iOS(interfaceOrientations: .portrait))
+                                updateUIAfterRotation();
+                            }else{
+                                setOrientation(to: .portrait)
+                                updateUIAfterRotation();
+                            }
+                        }
+                        self.dismiss(animated: true, completion: {
+                        self.delegate?.userDidScanWith(barcode: decodedURL)
+                        })
+                 }
+
+
+
+
+                }else{
+                    if decodedURL.count > minNumber && decodedURL.count < maxNumber {
+                        if SwiftFlutterBarcodeScannerPlugin.isOrientationLandscape == true {
+                            if #available(iOS 16.0, *) {
+                                let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene
+                                windowScene?.requestGeometryUpdate(.iOS(interfaceOrientations: .portrait))
+                                updateUIAfterRotation();
+                            }else{
+                                setOrientation(to: .portrait)
+                                updateUIAfterRotation();
+                            }
+                        }
+                        self.dismiss(animated: true, completion: {
+                        self.delegate?.userDidScanWith(barcode: decodedURL)
+                        })
+                 }
+
+                }
+                }
+                }
+
+                
+                
+                
+            }else{
+
+                if SwiftFlutterBarcodeScannerPlugin.isNeedOnlyDigitCondition == true {
+
+                    let isNumeric = decodedURL.allSatisfy { $0.isNumber }
+
+                    if isNumeric == true{
+                        if SwiftFlutterBarcodeScannerPlugin.isOrientationLandscape == true {
+                            if #available(iOS 16.0, *) {
+                                let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene
+                                windowScene?.requestGeometryUpdate(.iOS(interfaceOrientations: .portrait))
+                                updateUIAfterRotation();
+                            }else{
+                                setOrientation(to: .portrait)
+                                updateUIAfterRotation();
+                            }
+                        }
+                        self.dismiss(animated: true, completion: {
+                        self.delegate?.userDidScanWith(barcode: decodedURL)
+                        })
+                 }
+
+
+
+
+                }else{
+                    
+                        if SwiftFlutterBarcodeScannerPlugin.isOrientationLandscape == true {
+                            if #available(iOS 16.0, *) {
+                                let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene
+                                windowScene?.requestGeometryUpdate(.iOS(interfaceOrientations: .portrait))
+                                updateUIAfterRotation();
+                            }else{
+                                setOrientation(to: .portrait)
+                                updateUIAfterRotation();
+                            }
+                        }
+                        self.dismiss(animated: true, completion: {
+                        self.delegate?.userDidScanWith(barcode: decodedURL)
+                        })
+                 
+
+                }
+
+            }
+            
         }
     }
 }
@@ -857,14 +1226,15 @@ extension BarcodeScannerViewController{
             }
             
             
+            
             self.videoPreviewLayer?.frame = self.view.layer.bounds
             
             self.setVideoPreviewOrientation()
             self.xCor = self.isOrientationPortrait ? (self.screenSize.width - (self.screenSize.width*0.8))/2 :
-                (self.screenSize.width - (self.screenSize.width*0.6))/2
+            (self.screenSize.width - (self.screenSize.width*0.6))/2
             
             self.yCor = self.isOrientationPortrait ? (self.screenSize.height - (self.screenSize.width*0.8))/2 :
-                (self.screenSize.height - (self.screenSize.height*0.8))/2
+            (self.screenSize.height - (self.screenSize.height*0.8))/2
             
             self.videoPreviewLayer?.layoutIfNeeded()
             self.removeAllViews {
@@ -878,33 +1248,35 @@ extension BarcodeScannerViewController{
         }
     }
     
-//     Set video preview orientation
+    //     Set video preview orientation
     func setVideoPreviewOrientation(){
-        switch(UIDevice.current.orientation){
-        case .unknown:
-            self.videoPreviewLayer?.connection?.videoOrientation = AVCaptureVideoOrientation.portrait
-            break
-        case .portrait:
-            self.videoPreviewLayer?.connection?.videoOrientation = AVCaptureVideoOrientation.portrait
-            break
-        case .portraitUpsideDown:
-            self.videoPreviewLayer?.connection?.videoOrientation = AVCaptureVideoOrientation.portraitUpsideDown
-            break
-        case .landscapeLeft:
-            self.videoPreviewLayer?.connection?.videoOrientation = AVCaptureVideoOrientation.landscapeRight
-            break
-        case .landscapeRight:
-            self.videoPreviewLayer?.connection?.videoOrientation = AVCaptureVideoOrientation.landscapeLeft
-            break
-        case .faceUp:
-            self.videoPreviewLayer?.connection?.videoOrientation = AVCaptureVideoOrientation.portrait
-            break
-        case .faceDown:
-            self.videoPreviewLayer?.connection?.videoOrientation = AVCaptureVideoOrientation.portrait
-            break
-        @unknown default:
-            self.videoPreviewLayer?.connection?.videoOrientation = AVCaptureVideoOrientation.portrait
-            break
+        if SwiftFlutterBarcodeScannerPlugin.isOrientationLandscape == false {
+            switch(UIDevice.current.orientation){
+            case .unknown:
+                self.videoPreviewLayer?.connection?.videoOrientation = AVCaptureVideoOrientation.portrait
+                break
+            case .portrait:
+                self.videoPreviewLayer?.connection?.videoOrientation = AVCaptureVideoOrientation.portrait
+                break
+            case .portraitUpsideDown:
+                self.videoPreviewLayer?.connection?.videoOrientation = AVCaptureVideoOrientation.portraitUpsideDown
+                break
+            case .landscapeLeft:
+                self.videoPreviewLayer?.connection?.videoOrientation = AVCaptureVideoOrientation.landscapeRight
+                break
+            case .landscapeRight:
+                self.videoPreviewLayer?.connection?.videoOrientation = AVCaptureVideoOrientation.landscapeLeft
+                break
+            case .faceUp:
+                self.videoPreviewLayer?.connection?.videoOrientation = AVCaptureVideoOrientation.portrait
+                break
+            case .faceDown:
+                self.videoPreviewLayer?.connection?.videoOrientation = AVCaptureVideoOrientation.portrait
+                break
+            @unknown default:
+                self.videoPreviewLayer?.connection?.videoOrientation = AVCaptureVideoOrientation.portrait
+                break
+            }
         }
     }
     

@@ -1,5 +1,5 @@
 import 'dart:async';
-
+import 'dart:io';
 import 'package:flutter/services.dart';
 
 /// Scan mode which is either QR code or BARCODE
@@ -27,33 +27,60 @@ class FlutterScanner {
       {String? lineColor,
       String? cancelButtonText,
       bool? isShowFlashIcon,
+      bool? isShowInputIcon,
+      bool? isOrientationLandscape,
+      bool? isNeedLengthCondition,
+      bool? isNeedOnlyDigitCondition,
+      int? minimunLengthMinusOne,
+      int? maximunLengthPlusOne,
       ScanMode? scanMode,
       int? iconSize,
       Duration? duration,
       double? fontSize,
       String? flashIconPath,
       String? flashOffIconPath,
+      String? changeInputIconPath,
       String? changeCameraIconPath}) async {
     // Pass params to the plugin
     Map params = <String, dynamic>{
       'lineColor': lineColor ?? '#ff6666',
       'cancelButtonText': cancelButtonText ?? 'Cancel',
       'isShowFlashIcon': isShowFlashIcon ?? true,
-      'flashIconPath': flashIconPath ?? "",
-      'flashOffIconPath': flashOffIconPath ?? "",
-      'changeCameraIconPath': changeCameraIconPath ?? "",
+      'isShowInputIcon': isShowInputIcon ?? false,
+      'isOrientationLandscape': isOrientationLandscape ?? false,
+      'isNeedLengthCondition': isNeedLengthCondition ?? false,
+      'isNeedOnlyDigitCondition': isNeedOnlyDigitCondition ?? false,
+      'flashIconPath': flashIconPath ?? '',
+      'flashOffIconPath': flashOffIconPath ?? '',
+      'changeCameraIconPath': changeCameraIconPath ?? '',
+      'changeInputIconPath': changeInputIconPath ?? '',
       'isContinuousScan': false,
       'scanMode': scanMode?.index ?? 0,
-      'iconSize': iconSize?.toString() ?? "0",
-      'fontSize': fontSize?.toString() ?? "0",
-      'duration': duration?.inMilliseconds.toString() ?? "0",
+      'iconSize': iconSize?.toString() ?? '0',
+      'minimunLengthMinusOne': minimunLengthMinusOne?.toString() ?? '0',
+      'maximunLengthPlusOne': maximunLengthPlusOne?.toString() ?? '0',
+      'fontSize': fontSize?.toString() ?? '0',
+      'duration': duration?.inMilliseconds.toString() ?? '0',
     };
 
     print(params);
 
+    if (isOrientationLandscape == true && Platform.isIOS) {
+      SystemChrome.setPreferredOrientations([
+        DeviceOrientation.landscapeRight,
+      ]);
+    }
+
     // / Get barcode scan result
     final barcodeResult =
         await _channel.invokeMethod('scanBarcode', params) ?? '';
+    if (isOrientationLandscape == true &&
+        Platform.isIOS &&
+        barcodeResult != null) {
+      SystemChrome.setPreferredOrientations([
+        DeviceOrientation.portraitUp,
+      ]);
+    }
     return barcodeResult;
   }
 

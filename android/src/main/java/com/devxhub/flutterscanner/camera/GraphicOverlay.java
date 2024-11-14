@@ -89,7 +89,7 @@ public class GraphicOverlay<T extends GraphicOverlay.Graphic> extends View {
     public GraphicOverlay(Context context, AttributeSet attrs) {
         super(context, attrs);
 
-        rectWidth = AppConstants.BARCODE_RECT_WIDTH;
+        rectWidth = BarcodeCaptureActivity.SCAN_MODE == BarcodeCaptureActivity.SCAN_MODE_ENUM.QR.ordinal() ? AppConstants.BARCODE_RECT_WIDTH : (int) (AppConstants.BARCODE_RECT_WIDTH * 2);
         rectHeight = BarcodeCaptureActivity.SCAN_MODE == BarcodeCaptureActivity.SCAN_MODE_ENUM.QR.ordinal()
                 ? AppConstants.BARCODE_RECT_HEIGHT : (int) (AppConstants.BARCODE_RECT_HEIGHT / 1.5);
 

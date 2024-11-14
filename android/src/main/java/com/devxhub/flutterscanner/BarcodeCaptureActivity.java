@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 package com.devxhub.flutterscanner;
-
+import android.content.pm.ActivityInfo;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -88,7 +88,7 @@ public final class BarcodeCaptureActivity extends AppCompatActivity implements B
     private GestureDetector gestureDetector;
 
     private ImageView imgViewBarcodeCaptureUseFlash;
-    private ImageView imgViewSwitchCamera;
+    private ImageView imgViewSwitchCamera, imageViewInput;
     String flashIconPath = "";
     String flashOffIconPath = "";
 
@@ -113,11 +113,17 @@ public final class BarcodeCaptureActivity extends AppCompatActivity implements B
         try {
             setContentView(R.layout.barcode_capture);
 
+            if(FlutterBarcodeScannerPlugin.isOrientationLandscape){
+                setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+            }
+            
+
             String buttonText = "";
             String iconSize = "";
             String fontSize = "";
             String duration = "";
             String changeCameraIconPath = "";
+            String changeInputIconPath = "";
             flashIconPath = "";
             try {
                 buttonText = (String) getIntent().getStringExtra("cancelButtonText");
@@ -127,11 +133,12 @@ public final class BarcodeCaptureActivity extends AppCompatActivity implements B
                 flashIconPath = (String) getIntent().getStringExtra("flashIconPath");
                 flashOffIconPath = (String) getIntent().getStringExtra("flashOffIconPath");
                 changeCameraIconPath = (String) getIntent().getStringExtra("changeCameraIconPath");
+                changeInputIconPath = (String) getIntent().getStringExtra("changeInputIconPath");
             } catch (Exception e) {
                 buttonText = "Cancel";
                 iconSize = "50";
                 changeCameraIconPath = "";
-                changeCameraIconPath = "";
+                changeInputIconPath = "";
                 duration = "0";
                 Log.e("BCActivity:onCreate()", "onCreate: " + e.getLocalizedMessage());
             }
@@ -167,7 +174,18 @@ public final class BarcodeCaptureActivity extends AppCompatActivity implements B
  if(Integer.valueOf(iconSize) > 0){
             imgViewSwitchCamera.getLayoutParams().width = Integer.valueOf(iconSize);
             imgViewSwitchCamera.getLayoutParams().height = Integer.valueOf(iconSize);
+
+
  }
+
+            imageViewInput = findViewById(R.id.imageViewInput);
+            imageViewInput.setOnClickListener(this);
+            imageViewInput.setVisibility(FlutterBarcodeScannerPlugin.isShowInputIcon ? View.VISIBLE : View.GONE);
+            if(Integer.valueOf(iconSize) > 0) {
+                imageViewInput.getLayoutParams().width = Integer.valueOf(iconSize);
+                imageViewInput.getLayoutParams().height = Integer.valueOf(iconSize);
+
+            }
 
             mPreview = findViewById(R.id.preview);
             mGraphicOverlay = findViewById(R.id.graphicOverlay);
@@ -176,6 +194,15 @@ public final class BarcodeCaptureActivity extends AppCompatActivity implements B
                     InputStream is = getAssets().open("flutter_assets/" + changeCameraIconPath);
                     Drawable d = Drawable.createFromStream(is, null);
                     imgViewSwitchCamera.setImageDrawable(d);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+            if (!changeInputIconPath.equals("")) {
+                try {
+                    InputStream is = getAssets().open("flutter_assets/" + changeInputIconPath);
+                    Drawable d = Drawable.createFromStream(is, null);
+                    imageViewInput.setImageDrawable(d);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -203,7 +230,9 @@ public final class BarcodeCaptureActivity extends AppCompatActivity implements B
         TimerTask task = new TimerTask() {
             @Override
             public void run() {
-                
+                if(FlutterBarcodeScannerPlugin.isOrientationLandscape){
+                setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+            }
                 Barcode barcode = new Barcode();
                 barcode.rawValue = "-2";
                 barcode.displayValue = "-2";
@@ -390,6 +419,9 @@ public final class BarcodeCaptureActivity extends AppCompatActivity implements B
 
         DialogInterface.OnClickListener listener = new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
+                if(FlutterBarcodeScannerPlugin.isOrientationLandscape){
+                setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+            }
                 finish();
             }
         };
@@ -458,6 +490,9 @@ public final class BarcodeCaptureActivity extends AppCompatActivity implements B
         }
 
         if (best != null) {
+            if(FlutterBarcodeScannerPlugin.isOrientationLandscape){
+                setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+            }
             Intent data = new Intent();
             data.putExtra(BarcodeObject, best);
             setResult(CommonStatusCodes.SUCCESS, data);
@@ -504,6 +539,9 @@ public final class BarcodeCaptureActivity extends AppCompatActivity implements B
                 Log.e("BarcodeCaptureActivity", "FlashOnFailure: " + e.getLocalizedMessage());
             }
         } else if (i == R.id.btnBarcodeCaptureCancel) {
+            if(FlutterBarcodeScannerPlugin.isOrientationLandscape){
+                setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+            }
             Barcode barcode = new Barcode();
             barcode.rawValue = "-1";
             barcode.displayValue = "-1";
@@ -515,7 +553,80 @@ public final class BarcodeCaptureActivity extends AppCompatActivity implements B
             boolean useFlash = flashStatus == USE_FLASH.ON.ordinal();
             createCameraSource(autoFocus, useFlash, getInverseCameraFacing(currentFacing));
             startCameraSource();
+        } else if (i == R.id.imageViewInput) {
+            // mCameraSource.doZoomToggle();
+//            int currentFacing = mCameraSource.getCameraFacing();
+//            boolean autoFocus = mCameraSource.getFocusMode() != null;
+//            boolean useFlash = flashStatus == USE_FLASH.ON.ordinal();
+//            createCameraSourceMacro(autoFocus, useFlash, currentFacing);
+//            startCameraSource();
+
+if(FlutterBarcodeScannerPlugin.isOrientationLandscape){
+                setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+            }
+            Barcode barcode = new Barcode();
+                barcode.rawValue = "-3";
+                barcode.displayValue = "-3";
+                Intent data = new Intent();
+                data.putExtra(BarcodeObject, barcode);
+                setResult(CommonStatusCodes.SUCCESS, data);
+                finish();
+            
+
         }
+    }
+
+    @SuppressLint("InlinedApi")
+    private void createCameraSourceMacro(boolean autoFocus, boolean useFlash, int cameraFacing) {
+        Context context = getApplicationContext();
+
+        // A barcode detector is created to track barcodes. An associated
+        // multi-processor instance
+        // is set to receive the barcode detection results, track the barcodes, and
+        // maintain
+        // graphics for each barcode on screen. The factory is used by the
+        // multi-processor to
+        // create a separate tracker instance for each barcode.
+        BarcodeDetector barcodeDetector = new BarcodeDetector.Builder(context).build();
+        BarcodeTrackerFactory barcodeFactory = new BarcodeTrackerFactory(mGraphicOverlay, this);
+        barcodeDetector.setProcessor(new MultiProcessor.Builder<>(barcodeFactory).build());
+
+        if (!barcodeDetector.isOperational()) {
+            // Check for low storage. If there is low storage, the native library will not
+            // be
+            // downloaded, so detection will not become operational.
+            IntentFilter lowstorageFilter = new IntentFilter(Intent.ACTION_DEVICE_STORAGE_LOW);
+            boolean hasLowStorage = registerReceiver(null, lowstorageFilter) != null;
+
+            if (hasLowStorage) {
+                Toast.makeText(this, R.string.low_storage_error, Toast.LENGTH_LONG).show();
+            }
+        }
+
+        // Creates and starts the camera. Note that this uses a higher resolution in
+        // comparison
+        // to other detection examples to enable the barcode detector to detect small
+        // barcodes
+        // at long distances.
+        CameraSource.Builder builder = new CameraSource.Builder(getApplicationContext(), barcodeDetector).setFacing(cameraFacing).setRequestedPreviewSize(1600, 1024).setRequestedFps(30.0f).setFlashMode(useFlash ? Camera.Parameters.FLASH_MODE_TORCH : null);
+        builder = builder.setFocusMode( Camera.Parameters.FOCUS_MODE_MACRO );
+        // make sure that auto focus is an available option
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
+////            builder = builder.setFocusMode(autoFocus ? Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE : null);
+//            if(mCameraSource.isMacroModeAvailable()){
+//                builder = builder.setFocusMode( Camera.Parameters.FOCUS_MODE_MACRO );
+//            }else{
+//                builder = builder.setFocusMode(Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE);
+//            }
+//        }
+
+
+        // Stop & release current camera source before creating a new one.
+        if (mCameraSource != null) {
+            mCameraSource.stop();
+            mCameraSource.release();
+        }
+        mCameraSource = builder.build();
     }
 
     private int getInverseCameraFacing(int cameraFacing) {
@@ -612,16 +723,67 @@ public final class BarcodeCaptureActivity extends AppCompatActivity implements B
         }
     }
 
-    @Override
+     @Override
     public void onBarcodeDetected(Barcode barcode) {
         if (null != barcode) {
-            if (FlutterBarcodeScannerPlugin.isContinuousScan) {
-                FlutterBarcodeScannerPlugin.onBarcodeScanReceiver(barcode);
+            // Log.d("onBarcodeDetected()", "onBarcodeDetected: " + barcode);
+            // if(FlutterBarcodeScannerPlugin.isOrientationLandscape){
+                
+            // }
+            if (FlutterBarcodeScannerPlugin.isNeedLengthCondition && FlutterBarcodeScannerPlugin.minimunLengthMinusOne != "0" && FlutterBarcodeScannerPlugin.maximunLengthPlusOne != "0") {
+                if(FlutterBarcodeScannerPlugin.isNeedOnlyDigitCondition){
+
+                    if(barcode.rawValue.matches("\\d+") && barcode.rawValue.length() > Integer.valueOf(FlutterBarcodeScannerPlugin.minimunLengthMinusOne) && barcode.rawValue.length() <Integer.valueOf(FlutterBarcodeScannerPlugin.maximunLengthPlusOne)){
+                        if(FlutterBarcodeScannerPlugin.isOrientationLandscape){
+                        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+                        }
+                        Intent data = new Intent();
+                        data.putExtra(BarcodeObject, barcode);
+                        setResult(CommonStatusCodes.SUCCESS, data);
+                        finish();
+                    }
+
+                }else{
+                    if(barcode.rawValue.length() > Integer.valueOf(FlutterBarcodeScannerPlugin.minimunLengthMinusOne) && barcode.rawValue.length() <Integer.valueOf(FlutterBarcodeScannerPlugin.maximunLengthPlusOne)){
+                        if(FlutterBarcodeScannerPlugin.isOrientationLandscape){
+                        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+                        }
+                        Intent data = new Intent();
+                        data.putExtra(BarcodeObject, barcode);
+                        setResult(CommonStatusCodes.SUCCESS, data);
+                        finish();
+                    }
+
+                }
+                // Log.e("onBarcodeDetected()", "onBarcodeDetected: " + barcode);
+                // FlutterBarcodeScannerPlugin.onBarcodeScanReceiver(barcode);
             } else {
+
+                if(FlutterBarcodeScannerPlugin.isNeedOnlyDigitCondition){
+
+                    if(barcode.rawValue.matches("\\d+")){
+                        if(FlutterBarcodeScannerPlugin.isOrientationLandscape){
+                        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+                        }
+                        Intent data = new Intent();
+                        data.putExtra(BarcodeObject, barcode);
+                        setResult(CommonStatusCodes.SUCCESS, data);
+                        finish();
+                    }
+
+                }else{
+
+                    if(FlutterBarcodeScannerPlugin.isOrientationLandscape){
+                        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+                        }
                 Intent data = new Intent();
                 data.putExtra(BarcodeObject, barcode);
                 setResult(CommonStatusCodes.SUCCESS, data);
                 finish();
+
+                }
+                
+
             }
         }
     }
