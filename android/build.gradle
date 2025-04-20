@@ -23,6 +23,7 @@ apply plugin: 'com.android.library'
 
 android {
     compileSdkVersion 30
+    namespace 'com.devxhub.flutterscanner'
 
     defaultConfig {
         minSdkVersion 16
