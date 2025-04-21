@@ -63,7 +63,7 @@ After making the changes in Android ans iOS add flutter_scanner_devxhub to `pubs
 ```
 dependencies:
   ...
-  flutter_scanner_devxhub: ^1.0.3
+  flutter_scanner_devxhub: ^2.0.0
 ```
 
 1. You need to import the package first.

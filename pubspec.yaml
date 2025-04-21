@@ -1,6 +1,6 @@
 name: flutter_scanner_devxhub
 description: The Flutter Scanner plugin offers seamless barcode/QR code scanning capabilities for Flutter apps on Android/iOS. It supports a range of code types, boost app functionality.
-version: 1.0.3
+version: 2.0.0
 homepage: https://github.com/devxhub/flutter_scanner
 
 environment:

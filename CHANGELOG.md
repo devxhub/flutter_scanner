@@ -1,3 +1,7 @@
+## 2.0.0
+
+- Update with timer duration
+
 ## 1.0.3
 
 - add force orientation change
